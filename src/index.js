@@ -188,14 +188,15 @@ resolver.define('getPairs', async ({ context }) => {
     db.get('pairs:duplicates'),
     db.get('result:summary'),
   ]);
-  const all = [...selected, ...reserve, ...(rejected || []), ...(duplicates || [])].map((x) => x.id);
+  const all = [...selected, ...reserve, ...(rejected || []), ...(duplicates || [])].map((x) => x.id).concat((duplicates || []).map((d) => d.duplicateOf));
   const visible = await visibleKeys([...new Set(all)]);
   const seen = (x) => visible.has(x.id);
   return {
     selected: selected.filter(seen),
     reserve: reserve.filter(seen),
     rejected: (rejected || []).filter(seen),
-    duplicates: (duplicates || []).filter(seen),
+    // A duplicate names another request, so both must be visible to the caller.
+    duplicates: (duplicates || []).filter((d) => visible.has(d.id) && visible.has(d.duplicateOf)),
     summary,
   };
 });
