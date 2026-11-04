@@ -82,7 +82,7 @@ Install link: https://developer.atlassian.com/console/install/c4b582c2-566a-4180
 
 Full guide: docs/JUDGES.md in the repository: install, one-click demo data, a 10 minute walkthrough with the numbers you should see, and why each permission is needed.
 
-Demo video: https://youtu.be/FUgnW8DuilU (public on YouTube).
+Demo video: https://youtu.be/FUgnW8DuiIU (public on YouTube).
 
 ## Built with
 
