@@ -2,6 +2,8 @@
 
 Golden Set shows which support answers break when someone edits a help article. It builds a set of verified question and answer pairs from resolved Jira Service Management requests, ties each pair to the Confluence article it relies on, and when that article changes it tells you which answers are now likely wrong. It also gives you a CSV to re-test an AI agent in Rovo Agent Evaluations.
 
+Demo video (2:27): https://youtu.be/FUgnW8DuilU
+
 Time needed: about 3 minutes to install, about 10 minutes to try everything with the demo data.
 
 ## What you need
