@@ -1,0 +1,3611 @@
+{
+  "generatedFrom": "seed/data.mjs",
+  "site": "https://northwind-demo.atlassian.net",
+  "articles": [
+    {
+      "pageId": "100001",
+      "title": "Returns policy",
+      "version": 1,
+      "body": "<p>You can return most items within 30 days of delivery.</p><p>Returns are free: we email you a prepaid return label.</p><p>Opened headphones and earbuds cannot be returned for hygiene reasons unless they are faulty.</p><p>Opened laptops and tablets have a 15% restocking fee.</p><p>Your refund is issued within 7 business days after the item reaches our warehouse.</p>"
+    },
+    {
+      "pageId": "100002",
+      "title": "Warranty",
+      "version": 1,
+      "body": "<p>All Northwind Gear electronics come with a 2-year warranty from the date of purchase.</p><p>Accessories such as cables, straps and cases have a 1-year warranty.</p><p>The warranty covers manufacturing defects, not accidental damage or water damage.</p><p>To make a claim, send us the serial number and a short video of the problem.</p><p>Approved claims are repaired or replaced within 15 business days.</p><p>Extended protection adds 3 years of cover for $49.</p>"
+    },
+    {
+      "pageId": "100003",
+      "title": "Delivery times",
+      "version": 1,
+      "body": "<p>Standard delivery takes 4 business days.</p><p>Express delivery arrives in 1 business day and costs $12.</p><p>Orders over $75 ship free.</p><p>We ship to all EU countries. International delivery outside the EU takes up to 10 business days.</p>"
+    },
+    {
+      "pageId": "100004",
+      "title": "Order cancellation",
+      "version": 1,
+      "body": "<p>You can cancel an order free of charge within 2 hours of placing it.</p><p>After 2 hours, if the order has not shipped, we charge a $5 handling fee.</p><p>Once an order has shipped it cannot be cancelled. Please return it instead.</p><p>Preorders can be cancelled any time before the release date.</p>"
+    },
+    {
+      "pageId": "100005",
+      "title": "Refund methods",
+      "version": 1,
+      "body": "<p>Refunds go back to the original payment method.</p><p>Card refunds appear on your statement within 3 business days after we issue them.</p><p>PayPal refunds arrive within 24 hours.</p><p>If you prefer, we can issue store credit with a 10% bonus.</p><p>Gift card purchases are refunded as store credit only.</p>"
+    },
+    {
+      "pageId": "100006",
+      "title": "Damaged items",
+      "version": 1,
+      "body": "<p>If your item arrives damaged, report it within 48 hours of delivery.</p><p>Send us photos of the item and the box.</p><p>We ship a replacement within 2 business days at no cost, or refund you in full.</p><p>You do not need to return a damaged item worth under $30.</p>"
+    }
+  ],
+  "demoEdit": {
+    "pageId": "100001",
+    "version": 2,
+    "body": "<p>You can return most items within 14 days of delivery.</p><p>Returns are free: we email you a prepaid return label.</p><p>Opened headphones and earbuds cannot be returned for hygiene reasons unless they are faulty.</p><p>Opened laptops and tablets have a 15% restocking fee.</p><p>Your refund is issued within 7 business days after the item reaches our warehouse.</p>"
+  },
+  "customers": [
+    {
+      "id": "cust-1",
+      "name": "Jordan Blake",
+      "email": "jordan.blake@example.com",
+      "phone": "+44 20 7946 0958"
+    },
+    {
+      "id": "cust-2",
+      "name": "Priya Nair",
+      "email": "priya.nair@example.com",
+      "phone": "+1 415 555 0132"
+    },
+    {
+      "id": "cust-3",
+      "name": "Tomasz Kowal",
+      "email": "tomasz.kowal@example.com",
+      "phone": "+48 22 555 0147"
+    },
+    {
+      "id": "cust-4",
+      "name": "Emma Laurent",
+      "email": "emma.laurent@example.com",
+      "phone": "+33 1 55 50 01 23"
+    },
+    {
+      "id": "cust-5",
+      "name": "Lucas Ferreira",
+      "email": "lucas.ferreira@example.com",
+      "phone": "+351 21 555 0199"
+    }
+  ],
+  "agents": [
+    {
+      "id": "agent-1",
+      "name": "Sam Rivera"
+    },
+    {
+      "id": "agent-2",
+      "name": "Mia Chen"
+    }
+  ],
+  "requests": [
+    {
+      "key": "NW-101",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Can I still return my smartwatch?",
+      "description": "It arrived about three weeks ago and I do not like the strap. You can reach me at priya.nair@example.com.",
+      "created": "2026-09-01T16:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-01T16:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-01T17:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-101-c0",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-01T16:10:00.000Z"
+        },
+        {
+          "id": "NW-101-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Priya,\nYou have 30 days from delivery to return it, so you are still in time.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nMia Chen",
+          "created": "2026-09-01T16:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-01T17:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-102",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Too late to return a keyboard?",
+      "description": "The keyboard was delivered 25 days ago, unopened. Call me on +48 22 555 0147 if easier.",
+      "created": "2026-09-01T23:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-01T23:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-02T00:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-102-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Tomasz,\nNot too late. The return window is 30 days from delivery.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nSam Rivera",
+          "created": "2026-09-01T23:30:00.000Z"
+        },
+        {
+          "id": "NW-102-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-01T23:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-02T00:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-103",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Return period for a gift",
+      "description": "My aunt sent me a speaker as a present. How long can I return it?",
+      "created": "2026-09-02T06:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-02T06:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-02T07:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-103-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Emma,\nGifts follow the same rule: 30 days from the delivery date.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-02T06:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-02T07:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-104",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Changed my mind about the tablet case",
+      "description": "Can I send the case back? I never used it. My order is #NW-48004.",
+      "created": "2026-09-02T13:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-02T13:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-02T14:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-104-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Lucas,\nYes, as long as it is within 30 days of delivery and in its original packaging.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nCheers,\nSam Rivera",
+          "created": "2026-09-02T13:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-02T14:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-105",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Returning an unopened monitor",
+      "description": "Monitor still sealed, delivered last month. You can reach me at jordan.blake@example.com.",
+      "created": "2026-09-02T20:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-02T20:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-02T21:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-105-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Jordan, thanks for reaching out.\nOur window is 30 days from delivery. If it arrived less than 30 days ago you can still return it.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nBest regards,\nMia Chen",
+          "created": "2026-09-02T20:30:00.000Z"
+        },
+        {
+          "id": "NW-105-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "Great, thank you.",
+          "created": "2026-09-02T20:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-02T21:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-106",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "What is your return policy for drones?",
+      "description": "Thinking about buying the Falcon drone for my son. Call me on +1 415 555 0132 if easier.",
+      "created": "2026-09-03T03:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-03T03:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-03T04:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-106-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Priya,\nDrones can be returned within 30 days of delivery like most items.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nSam Rivera",
+          "created": "2026-09-03T03:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-03T04:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-107",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Do you accept returns on sale items?",
+      "description": "I bought the earphones case in the autumn sale.",
+      "created": "2026-09-03T10:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-03T10:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-03T11:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-107-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hey Tomasz,\nYes, sale items have the same 30-day return window.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nBest regards,\nMia Chen",
+          "created": "2026-09-03T10:30:00.000Z"
+        },
+        {
+          "id": "NW-107-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-03T10:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-03T11:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-108",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "When does my return window end for the camera?",
+      "description": "Bought the camera during the October promo. My order is #NW-48008.",
+      "created": "2026-09-03T17:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-03T17:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-03T18:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-108-c0",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-03T17:10:00.000Z"
+        },
+        {
+          "id": "NW-108-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Emma,\nYou can return it within 30 days after it was delivered.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nSam Rivera",
+          "created": "2026-09-03T17:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-03T18:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-109",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Do I have to pay for return shipping?",
+      "description": "Want to send back a phone stand. You can reach me at lucas.ferreira@example.com.",
+      "created": "2026-09-04T00:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-04T00:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-04T01:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-109-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hey Lucas,\nNo, returns are free. We email you a prepaid return label.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nMia Chen",
+          "created": "2026-09-04T00:30:00.000Z"
+        },
+        {
+          "id": "NW-109-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-04T00:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-04T01:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-110",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Can I return opened earbuds?",
+      "description": "Opened them once, the fit is wrong. Call me on +44 20 7946 0958 if easier.",
+      "created": "2026-09-04T07:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-04T07:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-04T08:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-110-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Jordan,\nOpened headphones and earbuds cannot be returned for hygiene reasons unless they are faulty.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-04T07:30:00.000Z"
+        },
+        {
+          "id": "NW-110-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "Thanks, that helps!",
+          "created": "2026-09-04T07:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-04T08:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-111",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Fee for returning an opened laptop?",
+      "description": "Opened the laptop but it is too heavy for me.",
+      "created": "2026-09-04T14:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-04T14:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-04T15:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-111-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Priya, thanks for reaching out.\nYes, opened laptops and tablets have a 15% restocking fee.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nBest regards,\nMia Chen",
+          "created": "2026-09-04T14:30:00.000Z"
+        },
+        {
+          "id": "NW-111-c2",
+          "author": {
+            "id": "cust-2",
+            "name": "Priya Nair"
+          },
+          "public": true,
+          "body": "Great, thank you.",
+          "created": "2026-09-04T14:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-04T15:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-112",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "When do I get my money back after a return?",
+      "description": "Sent the parcel back yesterday. My order is #NW-48012.",
+      "created": "2026-09-04T21:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-04T21:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-04T22:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-112-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Tomasz,\nWe issue the refund within 7 business days after the item reaches our warehouse.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-04T21:30:00.000Z"
+        },
+        {
+          "id": "NW-112-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-04T21:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-04T22:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-113",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Warranty length on the X200 headphones",
+      "description": "How long are they covered? You can reach me at emma.laurent@example.com.",
+      "created": "2026-09-05T04:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-05T04:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-05T05:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-113-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Emma,\nAll our electronics come with a 2-year warranty from the date of purchase.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nBest regards,\nMia Chen",
+          "created": "2026-09-05T04:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-05T05:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-114",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Is my charging cable under warranty?",
+      "description": "The cable stopped working after five months. Call me on +351 21 555 0199 if easier.",
+      "created": "2026-09-05T11:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-05T11:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-05T12:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-114-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Lucas, thanks for reaching out.\nYes, accessories like cables and cases have a 1-year warranty.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nKind regards,\nSam Rivera",
+          "created": "2026-09-05T11:30:00.000Z"
+        },
+        {
+          "id": "NW-114-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Great, thank you.",
+          "created": "2026-09-05T11:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-05T12:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-115",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Phone fell in water, covered?",
+      "description": "Dropped it in the pool.",
+      "created": "2026-09-05T18:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-05T18:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-05T19:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-115-c0",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-05T18:10:00.000Z"
+        },
+        {
+          "id": "NW-115-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Jordan, thanks for reaching out.\nSorry to hear that. The warranty covers manufacturing defects, not water damage.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-05T18:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-05T19:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-116",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "How do I make a warranty claim?",
+      "description": "My speaker crackles at high volume. My order is #NW-48016.",
+      "created": "2026-09-06T01:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-06T01:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-06T02:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-116-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Priya, thanks for reaching out.\nSend us the serial number and a short video of the problem, and we will review the claim.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nCheers,\nSam Rivera",
+          "created": "2026-09-06T01:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-06T02:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-117",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "How long does a warranty repair take?",
+      "description": "Already sent my claim. You can reach me at tomasz.kowal@example.com.",
+      "created": "2026-09-06T08:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-06T08:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-06T09:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-117-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Tomasz, thanks for reaching out.\nApproved claims are repaired or replaced within 15 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nBest regards,\nMia Chen",
+          "created": "2026-09-06T08:30:00.000Z"
+        },
+        {
+          "id": "NW-117-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-06T08:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-06T09:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-118",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "What does extended protection cost?",
+      "description": "Want extra cover for the new laptop. Call me on +33 1 55 50 01 23 if easier.",
+      "created": "2026-09-06T15:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-06T15:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-06T16:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-118-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Emma,\nExtended protection adds 3 years of cover for $49.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-06T15:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-06T16:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-119",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Laptop screen flickering after 18 months",
+      "description": "Is this still under warranty?",
+      "created": "2026-09-06T22:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-06T22:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-06T23:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-119-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Lucas,\nYes, that is within the 2-year warranty and a flickering screen counts as a manufacturing defect.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nBest regards,\nMia Chen",
+          "created": "2026-09-06T22:30:00.000Z"
+        },
+        {
+          "id": "NW-119-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Thanks, that helps!",
+          "created": "2026-09-06T22:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-06T23:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-120",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Cracked screen after a drop",
+      "description": "Will the warranty pay for the repair? My order is #NW-48020.",
+      "created": "2026-09-07T05:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-07T05:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-07T06:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-120-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Jordan, thanks for reaching out.\nNo, accidental damage is not covered by the warranty, only manufacturing defects.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-07T05:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-07T06:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-121",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Smartwatch strap broke after 8 months",
+      "description": "The clasp snapped. You can reach me at priya.nair@example.com.",
+      "created": "2026-09-07T12:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-07T12:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-07T13:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-121-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Priya,\nStraps are accessories with a 1-year warranty, so it is covered.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nKind regards,\nMia Chen",
+          "created": "2026-09-07T12:30:00.000Z"
+        },
+        {
+          "id": "NW-121-c2",
+          "author": {
+            "id": "cust-2",
+            "name": "Priya Nair"
+          },
+          "public": true,
+          "body": "Great, thank you.",
+          "created": "2026-09-07T12:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-07T13:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-122",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "How long does standard delivery take?",
+      "description": "Ordering a router today. Call me on +48 22 555 0147 if easier.",
+      "created": "2026-09-07T19:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-07T19:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-07T20:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-122-c0",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-07T19:10:00.000Z"
+        },
+        {
+          "id": "NW-122-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Tomasz,\nStandard delivery takes 4 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nKind regards,\nSam Rivera",
+          "created": "2026-09-07T19:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-07T20:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-123",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Do you have express shipping?",
+      "description": "Need a charger quickly.",
+      "created": "2026-09-08T02:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-08T02:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-08T03:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-123-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Emma,\nYes, express delivery arrives in 1 business day and costs $12.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nCheers,\nMia Chen",
+          "created": "2026-09-08T02:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-08T03:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-124",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Is shipping free?",
+      "description": "Planning a bigger order. My order is #NW-48024.",
+      "created": "2026-09-08T09:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-08T09:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-08T10:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-124-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Lucas,\nOrders over $75 ship free.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nBest regards,\nSam Rivera",
+          "created": "2026-09-08T09:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-08T10:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-125",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Do you ship to Canada?",
+      "description": "I live in Toronto. You can reach me at jordan.blake@example.com.",
+      "created": "2026-09-08T16:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-08T16:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-08T17:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-125-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Jordan,\nYes. International delivery outside the EU takes up to 10 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nKind regards,\nMia Chen",
+          "created": "2026-09-08T16:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-08T17:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-126",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Will my order arrive before the weekend?",
+      "description": "It is Tuesday now. Call me on +1 415 555 0132 if easier.",
+      "created": "2026-09-08T23:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-08T23:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-09T00:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-126-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Priya,\nStandard delivery takes 4 business days, express arrives in 1 business day.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nKind regards,\nSam Rivera",
+          "created": "2026-09-08T23:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-09T00:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-127",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "How much is express delivery?",
+      "description": "Is it worth paying extra?",
+      "created": "2026-09-09T06:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-09T06:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-09T07:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-127-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Tomasz, thanks for reaching out.\nExpress delivery costs $12 and arrives in 1 business day.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-09T06:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-09T07:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-128",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Do I pay shipping on a $70 order?",
+      "description": "My basket is just under the limit. My order is #NW-48028.",
+      "created": "2026-09-09T13:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-09T13:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-09T14:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-128-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Emma, thanks for reaching out.\nFree shipping starts at $75, so a small delivery fee applies to a $70 order.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nKind regards,\nSam Rivera",
+          "created": "2026-09-09T13:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-09T14:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-129",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "When does an order to Norway arrive?",
+      "description": "Sending a gift to Oslo. You can reach me at lucas.ferreira@example.com.",
+      "created": "2026-09-09T20:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-09T20:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-09T21:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-129-c0",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-09T20:10:00.000Z"
+        },
+        {
+          "id": "NW-129-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Lucas,\nInternational delivery outside the EU takes up to 10 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nBest regards,\nMia Chen",
+          "created": "2026-09-09T20:30:00.000Z"
+        },
+        {
+          "id": "NW-129-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Great, thank you.",
+          "created": "2026-09-09T20:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-09T21:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-130",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "How do I cancel my order?",
+      "description": "Ordered the wrong colour. Call me on +44 20 7946 0958 if easier.",
+      "created": "2026-09-10T03:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-10T03:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-10T04:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-130-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Jordan,\nYou can cancel free of charge within 2 hours of placing the order.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nKind regards,\nSam Rivera",
+          "created": "2026-09-10T03:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-10T04:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-131",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Ordered 3 hours ago, can I still cancel?",
+      "description": "It has not shipped yet I think.",
+      "created": "2026-09-10T10:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-10T10:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-10T11:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-131-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Priya, thanks for reaching out.\nYes, if it has not shipped. After 2 hours we charge a $5 handling fee.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-10T10:30:00.000Z"
+        },
+        {
+          "id": "NW-131-c2",
+          "author": {
+            "id": "cust-2",
+            "name": "Priya Nair"
+          },
+          "public": true,
+          "body": "Thanks, that helps!",
+          "created": "2026-09-10T10:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-10T11:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-132",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Is there a cancellation fee?",
+      "description": "Just checking before I order. My order is #NW-48032.",
+      "created": "2026-09-10T17:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-10T17:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-10T18:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-132-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Tomasz,\nCancelling is free within 2 hours. After that there is a $5 handling fee if the order has not shipped.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nBest regards,\nSam Rivera",
+          "created": "2026-09-10T17:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-10T18:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-133",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "My order already shipped, can I cancel?",
+      "description": "Tracking says it is on the way. You can reach me at emma.laurent@example.com.",
+      "created": "2026-09-11T00:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-11T00:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-11T01:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-133-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Emma,\nShipped orders cannot be cancelled. Please return the item instead.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nKind regards,\nMia Chen",
+          "created": "2026-09-11T00:30:00.000Z"
+        },
+        {
+          "id": "NW-133-c2",
+          "author": {
+            "id": "cust-4",
+            "name": "Emma Laurent"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-11T00:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-11T01:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-134",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Can I cancel a preorder?",
+      "description": "Preordered the new console. Call me on +351 21 555 0199 if easier.",
+      "created": "2026-09-11T07:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-11T07:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-11T08:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-134-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Lucas,\nPreorders can be cancelled any time before the release date.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nBest regards,\nSam Rivera",
+          "created": "2026-09-11T07:30:00.000Z"
+        },
+        {
+          "id": "NW-134-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Thanks, that helps!",
+          "created": "2026-09-11T07:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-11T08:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-135",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Placed a duplicate order by mistake",
+      "description": "Clicked buy twice 20 minutes ago.",
+      "created": "2026-09-11T14:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-11T14:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-11T15:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-135-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Jordan,\nNo problem, cancellations within 2 hours of placing the order are free.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nKind regards,\nMia Chen",
+          "created": "2026-09-11T14:30:00.000Z"
+        },
+        {
+          "id": "NW-135-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-11T14:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-11T15:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-136",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Why was I charged $5 after cancelling?",
+      "description": "I cancelled in the evening. My order is #NW-48036.",
+      "created": "2026-09-11T21:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-11T21:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-11T22:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-136-c0",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-11T21:10:00.000Z"
+        },
+        {
+          "id": "NW-136-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Priya, thanks for reaching out.\nCancellations after 2 hours carry a $5 handling fee.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-11T21:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-11T22:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-137",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Where will my refund go?",
+      "description": "Returned a mouse last week. You can reach me at tomasz.kowal@example.com.",
+      "created": "2026-09-12T04:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-12T04:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-12T05:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-137-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Tomasz, thanks for reaching out.\nRefunds go back to the original payment method.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nCheers,\nMia Chen",
+          "created": "2026-09-12T04:30:00.000Z"
+        },
+        {
+          "id": "NW-137-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-12T04:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-12T05:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-138",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Refund issued but not on my card yet",
+      "description": "You said it was refunded on Monday. Call me on +33 1 55 50 01 23 if easier.",
+      "created": "2026-09-12T11:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-12T11:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-12T12:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-138-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Emma,\nCard refunds appear on your statement within 3 business days after we issue them.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nBest regards,\nSam Rivera",
+          "created": "2026-09-12T11:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-12T12:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-139",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "How fast are PayPal refunds?",
+      "description": "Paid with PayPal.",
+      "created": "2026-09-12T18:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-12T18:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-12T19:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-139-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Lucas, thanks for reaching out.\nPayPal refunds arrive within 24 hours.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nBest regards,\nMia Chen",
+          "created": "2026-09-12T18:30:00.000Z"
+        },
+        {
+          "id": "NW-139-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-12T18:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-12T19:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-140",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Can I get store credit instead?",
+      "description": "I will buy something else anyway. My order is #NW-48040.",
+      "created": "2026-09-13T01:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-13T01:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-13T02:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-140-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Jordan,\nYes, we can issue store credit with a 10% bonus.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nCheers,\nSam Rivera",
+          "created": "2026-09-13T01:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-13T02:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-141",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Refund for a gift card purchase",
+      "description": "I paid with a gift card. You can reach me at priya.nair@example.com.",
+      "created": "2026-09-13T08:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-13T08:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-13T09:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-141-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Priya,\nGift card purchases are refunded as store credit only.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nCheers,\nMia Chen",
+          "created": "2026-09-13T08:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-13T09:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-142",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Bonus for choosing store credit?",
+      "description": "A friend said there is an extra. Call me on +48 22 555 0147 if easier.",
+      "created": "2026-09-13T15:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-13T15:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-13T16:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-142-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Tomasz,\nStore credit comes with a 10% bonus.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nBest regards,\nSam Rivera",
+          "created": "2026-09-13T15:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-13T16:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-143",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Refund to a different card?",
+      "description": "My old card expired.",
+      "created": "2026-09-13T22:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-13T22:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-13T23:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-143-c0",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-13T22:10:00.000Z"
+        },
+        {
+          "id": "NW-143-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hey Emma,\nRefunds can only go back to the original payment method.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-13T22:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-13T23:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-144",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Package arrived with a broken speaker",
+      "description": "The box was crushed. My order is #NW-48044.",
+      "created": "2026-09-14T05:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-14T05:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-14T06:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-144-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Lucas,\nPlease report it within 48 hours of delivery and send photos of the item and the box.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nBest regards,\nSam Rivera",
+          "created": "2026-09-14T05:30:00.000Z"
+        },
+        {
+          "id": "NW-144-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-14T05:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-14T06:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-145",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "What do you need for a damaged item?",
+      "description": "The lid of the case is cracked. You can reach me at jordan.blake@example.com.",
+      "created": "2026-09-14T12:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-14T12:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-14T13:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-145-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hey Jordan,\nPlease send photos of the item and the box.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nCheers,\nMia Chen",
+          "created": "2026-09-14T12:30:00.000Z"
+        },
+        {
+          "id": "NW-145-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "Thanks, that helps!",
+          "created": "2026-09-14T12:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-14T13:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-146",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "How quickly do you replace damaged items?",
+      "description": "Need the tablet for work. Call me on +1 415 555 0132 if easier.",
+      "created": "2026-09-14T19:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-14T19:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-14T20:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-146-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Priya,\nWe ship a replacement within 2 business days at no cost.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nKind regards,\nSam Rivera",
+          "created": "2026-09-14T19:30:00.000Z"
+        },
+        {
+          "id": "NW-146-c2",
+          "author": {
+            "id": "cust-2",
+            "name": "Priya Nair"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-14T19:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-14T20:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-147",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Do I send back a damaged $20 cable?",
+      "description": "The connector is bent.",
+      "created": "2026-09-15T02:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-15T02:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-15T03:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-147-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Tomasz, thanks for reaching out.\nNo, you do not need to return a damaged item worth under $30.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nCheers,\nMia Chen",
+          "created": "2026-09-15T02:30:00.000Z"
+        },
+        {
+          "id": "NW-147-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Perfect, thanks!",
+          "created": "2026-09-15T02:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-15T03:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-148",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Tablet screen cracked out of the box",
+      "description": "Opened it this morning. My order is #NW-48048.",
+      "created": "2026-09-15T09:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-15T09:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-15T10:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-148-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Emma,\nWe will ship a replacement within 2 business days or refund you in full. Please send photos within 48 hours of delivery.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-15T09:30:00.000Z"
+        },
+        {
+          "id": "NW-148-c2",
+          "author": {
+            "id": "cust-4",
+            "name": "Emma Laurent"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-15T09:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-15T10:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-149",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Refund instead of replacement for damage?",
+      "description": "I would rather have my money back. You can reach me at lucas.ferreira@example.com.",
+      "created": "2026-09-15T16:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-15T16:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-15T17:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-149-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Lucas,\nYes, we can refund you in full instead of sending a replacement.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-15T16:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-15T17:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-150",
+      "_label": "golden",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Found damage 5 days after delivery",
+      "description": "Only unpacked it now. Call me on +44 20 7946 0958 if easier.",
+      "created": "2026-09-15T23:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-15T23:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-16T00:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-150-c0",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": false,
+          "body": "Checked the order in the admin panel.",
+          "created": "2026-09-15T23:10:00.000Z"
+        },
+        {
+          "id": "NW-150-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Jordan, thanks for reaching out.\nDamage has to be reported within 48 hours of delivery.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nKind regards,\nSam Rivera",
+          "created": "2026-09-15T23:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-16T00:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-151",
+      "_label": "nolink_fact",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "How many days to return a mouse?",
+      "description": "Bought it online.",
+      "created": "2026-09-16T06:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-16T06:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-16T07:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-151-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hey Priya,\nYou have 30 days from delivery.\nCheers,\nMia Chen",
+          "created": "2026-09-16T06:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-16T07:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-152",
+      "_label": "nolink_fact",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Extended warranty price?",
+      "description": "For the soundbar. My order is #NW-48052.",
+      "created": "2026-09-16T13:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-16T13:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-16T14:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-152-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Tomasz, thanks for reaching out.\nIt is $49 for 3 extra years.\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-16T13:30:00.000Z"
+        },
+        {
+          "id": "NW-152-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-16T13:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-16T14:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-153",
+      "_label": "nolink_fact",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Next day delivery possible?",
+      "description": "Need it tomorrow. You can reach me at emma.laurent@example.com.",
+      "created": "2026-09-16T20:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-16T20:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-16T21:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-153-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Emma,\nExpress arrives in 1 business day for $12.\nCheers,\nMia Chen",
+          "created": "2026-09-16T20:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-16T21:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-154",
+      "_label": "nolink_fact",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Cancel fee after 4 hours?",
+      "description": "Still not shipped. Call me on +351 21 555 0199 if easier.",
+      "created": "2026-09-17T03:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-17T03:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-17T04:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-154-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Lucas,\nThere is a $5 fee if it has not shipped.\nThanks,\nSam Rivera\nNorthwind Gear Support",
+          "created": "2026-09-17T03:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-17T04:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-155",
+      "_label": "nolink_fact",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "PayPal refund time",
+      "description": "Returned headphones.",
+      "created": "2026-09-17T10:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-17T10:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-17T11:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-155-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Jordan, thanks for reaching out.\nWithin 24 hours.\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-17T10:30:00.000Z"
+        },
+        {
+          "id": "NW-155-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-17T10:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-17T11:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-156",
+      "_label": "nolink_fact",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Damaged item reporting deadline",
+      "description": "Box dented. My order is #NW-48056.",
+      "created": "2026-09-17T17:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-17T17:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-17T18:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-156-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Priya, thanks for reaching out.\nWithin 48 hours of delivery.\nBest regards,\nSam Rivera",
+          "created": "2026-09-17T17:30:00.000Z"
+        },
+        {
+          "id": "NW-156-c2",
+          "author": {
+            "id": "cust-2",
+            "name": "Priya Nair"
+          },
+          "public": true,
+          "body": "Got it, thanks.",
+          "created": "2026-09-17T17:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-17T18:00:00.000Z",
+      "csat": 4,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-157",
+      "_label": "nolink_none",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Do you have a store in Berlin?",
+      "description": "Want to see the speakers in person. You can reach me at tomasz.kowal@example.com.",
+      "created": "2026-09-18T00:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-18T00:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-18T01:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-157-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Tomasz,\nWe are online only at the moment.\nBest regards,\nMia Chen",
+          "created": "2026-09-18T00:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-18T01:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": null
+    },
+    {
+      "key": "NW-158",
+      "_label": "nolink_none",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Can I change the delivery address?",
+      "description": "Moving flats next week. Call me on +33 1 55 50 01 23 if easier.",
+      "created": "2026-09-18T07:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-18T07:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-18T08:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-158-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Emma,\nYes, reply with the new address before the order ships.\nKind regards,\nSam Rivera",
+          "created": "2026-09-18T07:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-18T08:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": null
+    },
+    {
+      "key": "NW-159",
+      "_label": "nolink_none",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Is the X200 compatible with iPhone?",
+      "description": "Before I buy.",
+      "created": "2026-09-18T14:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-18T14:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-18T15:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-159-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Lucas, thanks for reaching out.\nYes, it works with any Bluetooth device.\nKind regards,\nMia Chen",
+          "created": "2026-09-18T14:30:00.000Z"
+        },
+        {
+          "id": "NW-159-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "Thanks, that helps!",
+          "created": "2026-09-18T14:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-18T15:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": null
+    },
+    {
+      "key": "NW-160",
+      "_label": "nolink_none",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Do you sell refurbished items?",
+      "description": "Looking for a cheaper laptop. My order is #NW-48060.",
+      "created": "2026-09-18T21:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-18T21:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-18T22:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-160-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Jordan,\nNot yet, but we are planning to.\nKind regards,\nSam Rivera",
+          "created": "2026-09-18T21:30:00.000Z"
+        },
+        {
+          "id": "NW-160-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "Great, thank you.",
+          "created": "2026-09-18T21:45:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-18T22:00:00.000Z",
+      "csat": 5,
+      "_expectedPageId": null
+    },
+    {
+      "key": "NW-161",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Return label not received",
+      "description": "Asked for a return 2 days ago. You can reach me at priya.nair@example.com.",
+      "created": "2026-09-19T04:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-19T04:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-19T05:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-19T14:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-19T19:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-161-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Priya,\nReturns are free, we email you a prepaid return label.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nCheers,\nMia Chen",
+          "created": "2026-09-19T04:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-19T19:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-162",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Can I return headphones after 20 days?",
+      "description": "Opened but faulty. Call me on +48 22 555 0147 if easier.",
+      "created": "2026-09-19T11:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-19T11:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-19T12:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-19T21:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T02:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-162-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Tomasz,\nYou have 30 days from delivery to return it.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nSam Rivera",
+          "created": "2026-09-19T11:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-20T02:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-163",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Warranty claim for a dead power bank",
+      "description": "It will not charge.",
+      "created": "2026-09-19T18:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-19T18:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-19T19:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T04:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T09:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-163-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Emma, thanks for reaching out.\nSend us the serial number and a short video of the problem.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-19T18:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-20T09:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-164",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Order stuck in transit",
+      "description": "It has been a week. My order is #NW-48064.",
+      "created": "2026-09-20T01:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T01:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T02:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T11:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T16:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-164-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Lucas,\nStandard delivery takes 4 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nKind regards,\nSam Rivera",
+          "created": "2026-09-20T01:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-20T16:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-165",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Cancel order placed this morning",
+      "description": "It is not needed anymore. You can reach me at jordan.blake@example.com.",
+      "created": "2026-09-20T08:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T08:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T09:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T18:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T23:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-165-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Jordan, thanks for reaching out.\nYou can cancel free of charge within 2 hours of placing the order.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nKind regards,\nMia Chen",
+          "created": "2026-09-20T08:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-20T23:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-166",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Refund missing after two weeks",
+      "description": "Still nothing on my card. Call me on +1 415 555 0132 if easier.",
+      "created": "2026-09-20T15:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T15:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T16:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-21T01:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-21T06:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-166-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Priya,\nCard refunds appear on your statement within 3 business days after we issue them.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nBest regards,\nSam Rivera",
+          "created": "2026-09-20T15:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-21T06:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-167",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Replacement never arrived",
+      "description": "Reported damage last week.",
+      "created": "2026-09-20T22:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-20T22:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-20T23:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-21T08:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-21T13:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-167-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hey Tomasz,\nWe ship a replacement within 2 business days at no cost.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nBest regards,\nMia Chen",
+          "created": "2026-09-20T22:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-21T13:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-168",
+      "_label": "reopened",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Return window for a gaming chair",
+      "description": "Arrived 10 days ago. My order is #NW-48068.",
+      "created": "2026-09-21T05:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-21T05:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-21T06:00:00.000Z"
+        },
+        {
+          "fromCategory": "done",
+          "toCategory": "indeterminate",
+          "at": "2026-09-21T15:00:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-21T20:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-168-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Emma,\nMost items can be returned within 30 days of delivery.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nKind regards,\nSam Rivera",
+          "created": "2026-09-21T05:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-21T20:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-169",
+      "_label": "complaint",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Prepaid label does not open",
+      "description": "The link in the email is broken. You can reach me at lucas.ferreira@example.com.",
+      "created": "2026-09-21T12:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-21T12:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-21T13:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-169-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Lucas, thanks for reaching out.\nReturns are free: we email you a prepaid return label.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-21T12:30:00.000Z"
+        },
+        {
+          "id": "NW-169-c2",
+          "author": {
+            "id": "cust-5",
+            "name": "Lucas Ferreira"
+          },
+          "public": true,
+          "body": "That didn't solve it, the problem is still there.",
+          "created": "2026-09-21T12:50:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-21T13:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-170",
+      "_label": "complaint",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Express order did not come next day",
+      "description": "I paid for express. Call me on +44 20 7946 0958 if easier.",
+      "created": "2026-09-21T19:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-21T19:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-21T20:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-170-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Jordan,\nExpress delivery arrives in 1 business day and costs $12.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nCheers,\nSam Rivera",
+          "created": "2026-09-21T19:30:00.000Z"
+        },
+        {
+          "id": "NW-170-c2",
+          "author": {
+            "id": "cust-1",
+            "name": "Jordan Blake"
+          },
+          "public": true,
+          "body": "That didn't solve it, the problem is still there.",
+          "created": "2026-09-21T19:50:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-21T20:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-171",
+      "_label": "complaint",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Store credit bonus not applied",
+      "description": "I got only the base amount.",
+      "created": "2026-09-22T02:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-22T02:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-22T03:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-171-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Priya,\nWe can issue store credit with a 10% bonus.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-22T02:30:00.000Z"
+        },
+        {
+          "id": "NW-171-c2",
+          "author": {
+            "id": "cust-2",
+            "name": "Priya Nair"
+          },
+          "public": true,
+          "body": "That didn't solve it, the problem is still there.",
+          "created": "2026-09-22T02:50:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-22T03:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-172",
+      "_label": "complaint",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Warranty repair taking too long",
+      "description": "Waiting for three weeks. My order is #NW-48072.",
+      "created": "2026-09-22T09:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-22T09:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-22T10:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-172-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Tomasz,\nApproved claims are repaired or replaced within 15 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nKind regards,\nSam Rivera",
+          "created": "2026-09-22T09:30:00.000Z"
+        },
+        {
+          "id": "NW-172-c2",
+          "author": {
+            "id": "cust-3",
+            "name": "Tomasz Kowal"
+          },
+          "public": true,
+          "body": "That didn't solve it, the problem is still there.",
+          "created": "2026-09-22T09:50:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-22T10:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-173",
+      "_label": "low_csat",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Charged after cancelling",
+      "description": "I cancelled within the hour. You can reach me at emma.laurent@example.com.",
+      "created": "2026-09-22T16:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-22T16:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-22T17:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-173-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hello Emma,\nAfter 2 hours, if the order has not shipped, we charge a $5 handling fee.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nCheers,\nMia Chen",
+          "created": "2026-09-22T16:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-22T17:00:00.000Z",
+      "csat": 2,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-174",
+      "_label": "low_csat",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Broken screen, want a refund",
+      "description": "Photos attached. Call me on +351 21 555 0199 if easier.",
+      "created": "2026-09-22T23:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-22T23:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-23T00:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-174-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hey Lucas,\nWe ship a replacement within 2 business days at no cost.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nBest regards,\nSam Rivera",
+          "created": "2026-09-22T23:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-23T00:00:00.000Z",
+      "csat": 2,
+      "_expectedPageId": "100006"
+    },
+    {
+      "key": "NW-175",
+      "_label": "low_csat",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Restocking fee on a sealed tablet",
+      "description": "It was never opened.",
+      "created": "2026-09-23T06:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-23T06:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-23T07:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-175-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Jordan,\nOpened laptops and tablets have a 15% restocking fee.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100001/Returns+policy\nCheers,\nMia Chen",
+          "created": "2026-09-23T06:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-23T07:00:00.000Z",
+      "csat": 1,
+      "_expectedPageId": "100001"
+    },
+    {
+      "key": "NW-176",
+      "_label": "duplicate",
+      "reporter": {
+        "id": "cust-2",
+        "name": "Priya Nair"
+      },
+      "summary": "Hello, how long does standard delivery take?",
+      "description": "Ordering a router today. My order is #NW-48076.",
+      "created": "2026-09-23T13:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-23T13:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-23T14:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-176-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Priya,\nStandard delivery takes 4 business days.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100003/Delivery+times\nKind regards,\nSam Rivera",
+          "created": "2026-09-23T13:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-23T14:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100003"
+    },
+    {
+      "key": "NW-177",
+      "_label": "duplicate",
+      "reporter": {
+        "id": "cust-3",
+        "name": "Tomasz Kowal"
+      },
+      "summary": "Hello, is my charging cable under warranty?",
+      "description": "The cable stopped working after five months. You can reach me at tomasz.kowal@example.com.",
+      "created": "2026-09-23T20:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-23T20:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-23T21:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-177-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Tomasz,\nYes, accessories like cables and cases have a 1-year warranty.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100002/Warranty\nBest regards,\nMia Chen",
+          "created": "2026-09-23T20:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-23T21:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100002"
+    },
+    {
+      "key": "NW-178",
+      "_label": "duplicate",
+      "reporter": {
+        "id": "cust-4",
+        "name": "Emma Laurent"
+      },
+      "summary": "Hello, how do I cancel my order?",
+      "description": "Ordered the wrong colour. Call me on +33 1 55 50 01 23 if easier.",
+      "created": "2026-09-24T03:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-24T03:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-24T04:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-178-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hi Emma,\nYou can cancel free of charge within 2 hours of placing the order.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100004/Order+cancellation\nCheers,\nSam Rivera",
+          "created": "2026-09-24T03:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-24T04:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100004"
+    },
+    {
+      "key": "NW-179",
+      "_label": "duplicate",
+      "reporter": {
+        "id": "cust-5",
+        "name": "Lucas Ferreira"
+      },
+      "summary": "Hello, how fast are PayPal refunds?",
+      "description": "Paid with PayPal.",
+      "created": "2026-09-24T10:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-24T10:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-24T11:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-179-c1",
+          "author": {
+            "id": "agent-2",
+            "name": "Mia Chen"
+          },
+          "public": true,
+          "body": "Hi Lucas,\nPayPal refunds arrive within 24 hours.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100005/Refund+methods\nThanks,\nMia Chen\nNorthwind Gear Support",
+          "created": "2026-09-24T10:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-24T11:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100005"
+    },
+    {
+      "key": "NW-180",
+      "_label": "duplicate",
+      "reporter": {
+        "id": "cust-1",
+        "name": "Jordan Blake"
+      },
+      "summary": "Hello, what do you need for a damaged item?",
+      "description": "The lid of the case is cracked. My order is #NW-48080.",
+      "created": "2026-09-24T17:00:00.000Z",
+      "statusHistory": [
+        {
+          "fromCategory": "new",
+          "toCategory": "indeterminate",
+          "at": "2026-09-24T17:05:00.000Z"
+        },
+        {
+          "fromCategory": "indeterminate",
+          "toCategory": "done",
+          "at": "2026-09-24T18:00:00.000Z"
+        }
+      ],
+      "comments": [
+        {
+          "id": "NW-180-c1",
+          "author": {
+            "id": "agent-1",
+            "name": "Sam Rivera"
+          },
+          "public": true,
+          "body": "Hello Jordan,\nPlease send photos of the item and the box.\nMore details: https://northwind-demo.atlassian.net/wiki/spaces/HELP/pages/100006/Damaged+items\nCheers,\nSam Rivera",
+          "created": "2026-09-24T17:30:00.000Z"
+        }
+      ],
+      "resolvedAt": "2026-09-24T18:00:00.000Z",
+      "csat": null,
+      "_expectedPageId": "100006"
+    }
+  ]
+}

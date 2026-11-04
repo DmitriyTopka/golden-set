@@ -1,0 +1,23 @@
+{
+  "name": "golden-set",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Golden Set: find which support answers break when you edit a help article. Forge app for Jira Service Management and Confluence.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "seed:generate": "node seed/generate.mjs",
+    "seed:verify": "node seed/verify.mjs"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "collectCoverageFrom": ["core/**/*.js"],
+    "coverageThreshold": { "global": { "lines": 80, "branches": 70, "functions": 80 } }
+  },
+  "devDependencies": {
+    "jest": "30.5.2"
+  }
+}
