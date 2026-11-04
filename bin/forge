@@ -1,0 +1,6 @@
+#!/bin/sh
+# Forge CLI 15 needs Node >= 24.22.1; the system Node is older and shared with other projects.
+# This wrapper runs the CLI on a private Node from ~/.local/node24 without touching the system one.
+NODE_DIR="$HOME/.local/node24/node_modules/node/bin"
+export PATH="$NODE_DIR:$PATH"
+exec "$NODE_DIR/node" /usr/local/lib/node_modules/@forge/cli/out/bin/cli.js "$@"

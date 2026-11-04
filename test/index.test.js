@@ -5,5 +5,5 @@ test('public surface exports every module the Forge app will use', () => {
     expect(typeof core[name]).toBe('function');
   }
   expect(core.DEFAULT_LIMIT).toBe(50);
-  expect(core.CHUNK_SIZE).toBe(50);
+  expect(core.CHUNK_SIZE).toBe(100);
 });

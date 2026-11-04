@@ -1,10 +1,9 @@
 // CSV for Rovo Agent Evaluations: one prompt column and an optional expected-response column.
-// Docs say up to 100 prompts per dataset, an Atlassian Community lesson says 50, so we
-// chunk at 50 until the limit is confirmed on a real site.
+// Limit confirmed on a demo site 04.11: "can't exceed 100 prompts. The first row will be used as a header."
 
 import { containsPII } from './pii.js';
 
-export const CHUNK_SIZE = 50;
+export const CHUNK_SIZE = 100;
 export const HEADER = ['prompt', 'expected_response'];
 
 export function escapeCell(value) {

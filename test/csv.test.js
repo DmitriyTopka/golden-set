@@ -24,11 +24,11 @@ describe('csv', () => {
     expect(parseCsv(toCsv(pairs, { withExpected: false, header: false }))).toEqual(pairs.map((p) => [p.question]));
   });
 
-  test('chunks at 50 rows', () => {
-    const many = Array.from({ length: 120 }, (_, i) => ({ question: `q${i}`, expected: 'a' }));
+  test('chunks at 100 rows, the Evaluations limit', () => {
+    const many = Array.from({ length: 250 }, (_, i) => ({ question: `q${i}`, expected: 'a' }));
     const files = toCsvChunks(many);
     expect(files).toHaveLength(3);
-    expect(parseCsv(files[2])).toHaveLength(21);
+    expect(parseCsv(files[2])).toHaveLength(51);
     expect(chunk([1, 2, 3], 2)).toEqual([[1, 2], [3]]);
   });
 
@@ -41,11 +41,11 @@ describe('csv', () => {
     expect(validateCsv('q@example.com,x\n').errors[0]).toMatch(/personal data/);
   });
 
-  test('row limit is configurable for the 100-prompt limit', () => {
-    const many = Array.from({ length: 60 }, (_, i) => ({ question: `q${i}`, expected: 'a' }));
+  test('row limit defaults to 100 and is configurable', () => {
+    const many = Array.from({ length: 120 }, (_, i) => ({ question: `q${i}`, expected: 'a' }));
     const csv = toCsv(many);
     expect(validateCsv(csv).ok).toBe(false);
-    expect(validateCsv(csv, { maxRows: 100 }).ok).toBe(true);
+    expect(validateCsv(csv, { maxRows: 200 }).ok).toBe(true);
   });
 
   test('parser handles BOM and missing trailing newline', () => {
