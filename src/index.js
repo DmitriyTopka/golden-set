@@ -13,6 +13,7 @@ import { readArticles } from './confluence.js';
 import { seedNext, seedState, resetSeed } from './seed.js';
 import { registerProject, publishByline, readByline, saveBaselines, checkPage, checkProject, listImpacts, acceptEdit } from './impact.js';
 import { selectGoldenSet, reselect, toCsvChunks } from '../core/index.js';
+import { permissions, canSeeSpace, visibleKeys, readableImpacts } from './access.js';
 
 const resolver = new Resolver();
 const SCAN_BATCH = 10;
@@ -21,19 +22,6 @@ function projectKeyOf(context) {
   const key = context?.extension?.project?.key;
   if (!key) throw new Error('Open Golden Set from a service project.');
   return key;
-}
-
-async function permissions(projectKey) {
-  const res = await call('user', 'jira', route`/rest/api/3/mypermissions?projectKey=${projectKey}&permissions=BROWSE_PROJECTS,ADMINISTER_PROJECTS`);
-  return {
-    browse: Boolean(res?.permissions?.BROWSE_PROJECTS?.havePermission),
-    admin: Boolean(res?.permissions?.ADMINISTER_PROJECTS?.havePermission),
-  };
-}
-
-async function canSeeSpace(spaceId) {
-  const res = await call('user', 'confluence', route`/wiki/api/v2/spaces/${spaceId}`, { allow404: true }).catch(() => null);
-  return Boolean(res?.id);
 }
 
 /** Resolves the project, checks the caller and returns project-scoped storage. */
@@ -194,20 +182,6 @@ async function readerDb(context) {
   return db;
 }
 
-/** Keys of the given requests that the calling user can open. */
-async function visibleKeys(keys) {
-  const visible = new Set();
-  for (let i = 0; i < keys.length; i += 100) {
-    const chunk = keys.slice(i, i + 100);
-    const res = await call('user', 'jira', route`/rest/api/3/search/jql`, {
-      method: 'POST',
-      body: { jql: `key in (${chunk.join(',')})`, fields: ['summary'], maxResults: 100 },
-    });
-    for (const issue of res?.issues || []) visible.add(issue.key);
-  }
-  return visible;
-}
-
 resolver.define('getPairs', async ({ context }) => {
   const db = await readerDb(context);
   const [selected, reserve, rejected, duplicates, summary, excluded] = await Promise.all([
@@ -253,9 +227,7 @@ resolver.define('markNotGolden', async ({ payload, context }) => {
 resolver.define('getImpacts', async ({ context }) => {
   const db = await readerDb(context);
   // Pages inside the space can carry their own restrictions: show only impacts on pages the caller can read.
-  const all = await listImpacts(db);
-  const readable = await Promise.all(all.map((r) => call('user', 'confluence', route`/wiki/api/v2/pages/${r.pageId}`, { allow404: true }).then((p) => Boolean(p?.id)).catch(() => false)));
-  const impacts = all.filter((_, i) => readable[i]);
+  const impacts = await readableImpacts(await listImpacts(db));
   const ids = [...new Set(impacts.flatMap((r) => r.affected.map((a) => a.id)))];
   const visible = await visibleKeys(ids);
   return impacts.map((r) => {

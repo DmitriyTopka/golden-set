@@ -6,7 +6,7 @@
 import { route, kvs } from './forge.js';
 import { call } from './http.js';
 import { forProject } from './store.js';
-import { diffArticle, computeImpact, suggestFix } from '../core/index.js';
+import { diffArticle, computeImpact, suggestAnswer } from '../core/index.js';
 import { stripMarkup } from '../core/text.js';
 
 // Jira and Confluence get separate installations of the app, and each installation has its own
@@ -125,7 +125,8 @@ export async function checkPage(projectKey, pageId) {
     counts: impact.counts,
     affected: impact.affected.map((a) => {
       const p = byId.get(a.id);
-      return { ...a, question: p.question, expected: p.expected, suggestion: a.status === 'likely_outdated' ? suggestFix(p.expected, diff.outdatedFacts) : null };
+      const fix = a.status === 'likely_outdated' ? suggestAnswer(p, diff.outdatedFacts) : { suggestion: null, needsReview: null };
+      return { ...a, question: p.question, expected: p.expected, suggestion: fix.suggestion, needsReview: fix.needsReview };
     }),
   };
   const previous = await db.get(`impact:${id}`);

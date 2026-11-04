@@ -1,40 +1,28 @@
 // Rovo agent actions. All read-only (actionVerb GET): the agent explains, it never changes data.
 // Each action answers only with what the asking user could see in Jira themselves.
-import { route } from './forge.js';
-import { call } from './http.js';
-import { forProject } from './store.js';
 import { registeredProjects, listImpacts } from './impact.js';
 import { toCsv } from '../core/index.js';
+import { readerAccess, readableImpacts, visibleKeys, canReadPage } from './access.js';
 
-async function canBrowse(projectKey) {
-  try {
-    const res = await call('user', 'jira', route`/rest/api/3/mypermissions?projectKey=${projectKey}&permissions=BROWSE_PROJECTS`);
-    return Boolean(res?.permissions?.BROWSE_PROJECTS?.havePermission);
-  } catch {
-    return false;
-  }
-}
-
-async function visibleKeys(keys) {
-  const visible = new Set();
-  for (let i = 0; i < keys.length; i += 100) {
-    const res = await call('user', 'jira', route`/rest/api/3/search/jql`, {
-      method: 'POST',
-      body: { jql: `key in (${keys.slice(i, i + 100).join(',')})`, fields: ['summary'], maxResults: 100 },
-    });
-    for (const issue of res?.issues || []) visible.add(issue.key);
-  }
-  return visible;
-}
-
-/** Projects the asking user can browse, with their storage. */
+/**
+ * Projects the asking user may read: the same gate as the Golden Set page (browse permission in Jira
+ * and access to the knowledge base space the pairs were built from).
+ */
 async function myProjects() {
-  const all = await registeredProjects();
-  // Diagnostic for the multi-install question: which installation runs Rovo actions, and what it can see.
-  console.log(`rovo action: ${all.length} registered project(s) in this installation`);
   const out = [];
-  for (const key of all) if (await canBrowse(key)) out.push({ key, db: forProject(key) });
+  for (const key of await registeredProjects()) {
+    const access = await readerAccess(key);
+    if (access) out.push({ key, db: access.db });
+  }
   return out;
+}
+
+/** Pairs on pages the user cannot read are left out, like on the Golden Set page. */
+async function onReadablePages(pairs) {
+  const pages = [...new Set(pairs.map((p) => p.link?.pageId).filter(Boolean))];
+  const ok = new Set();
+  for (const id of pages) if (await canReadPage(id)) ok.add(id);
+  return pairs.filter((p) => p.link?.pageId && ok.has(p.link.pageId));
 }
 
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
@@ -53,10 +41,11 @@ export async function listArticleImpacts(payload) {
   if (projects.length === 0) return noProjects;
   const result = [];
   for (const { key, db } of projects) {
-    for (const r of await listImpacts(db)) {
+    for (const r of await readableImpacts(await listImpacts(db))) {
       if (!matchesArticle(r.title, payload?.articleTitle)) continue;
       const visible = await visibleKeys(r.affected.map((a) => a.id));
       const affected = r.affected.filter((a) => visible.has(a.id));
+      if (affected.length === 0) continue;
       result.push({
         project: key,
         article: r.title,
@@ -64,7 +53,13 @@ export async function listArticleImpacts(payload) {
         goldenAnswersOnThisArticle: affected.length,
         likelyOutdated: affected
           .filter((a) => a.status === 'likely_outdated')
-          .map((a) => ({ request: a.id, question: a.question, currentExpectedAnswer: a.expected, suggestedAnswer: a.suggestion })),
+          .map((a) => ({
+            request: a.id,
+            question: a.question,
+            currentExpectedAnswer: a.expected,
+            suggestedAnswer: a.suggestion,
+            ...(a.needsReview ? { note: 'No suggestion: the answer decides from how long ago the customer got the item, so a person should rewrite it.' } : {}),
+          })),
         toRecheck: affected.filter((a) => a.status !== 'likely_outdated').map((a) => a.id),
         checkedAt: r.checkedAt,
       });
@@ -79,7 +74,7 @@ export async function getArticlePairs(payload) {
   if (projects.length === 0) return noProjects;
   const out = [];
   for (const { key, db } of projects) {
-    const pairs = (await db.getList('pairs:selected')).filter((p) => p.articleTitle && matchesArticle(p.articleTitle, payload?.articleTitle));
+    const pairs = await onReadablePages((await db.getList('pairs:selected')).filter((p) => p.articleTitle && matchesArticle(p.articleTitle, payload?.articleTitle)));
     const visible = await visibleKeys(pairs.map((p) => p.id));
     for (const p of pairs.filter((x) => visible.has(x.id))) {
       out.push({ project: key, article: p.articleTitle, request: p.id, question: p.question, expectedAnswer: p.expected });
@@ -94,9 +89,9 @@ export async function getRetestCsv(payload) {
   if (projects.length === 0) return noProjects;
   const rows = [];
   for (const { db } of projects) {
-    const impacts = (await listImpacts(db)).filter((r) => matchesArticle(r.title, payload?.articleTitle));
+    const impacts = (await readableImpacts(await listImpacts(db))).filter((r) => matchesArticle(r.title, payload?.articleTitle));
     const ids = new Set(impacts.flatMap((r) => r.affected.map((a) => a.id)));
-    const pairs = (await db.getList('pairs:selected')).filter((p) => (ids.size ? ids.has(p.id) : p.articleTitle && matchesArticle(p.articleTitle, payload?.articleTitle)));
+    const pairs = await onReadablePages((await db.getList('pairs:selected')).filter((p) => (ids.size ? ids.has(p.id) : p.articleTitle && matchesArticle(p.articleTitle, payload?.articleTitle))));
     const visible = await visibleKeys(pairs.map((p) => p.id));
     rows.push(...pairs.filter((p) => visible.has(p.id)));
   }

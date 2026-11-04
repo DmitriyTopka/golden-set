@@ -42,3 +42,4 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .status.warn { background: #fff7d6; color: #7f5f01; }
 .status.info { background: #e9f2ff; color: #0055cc; }
 .bad-text { color: #ae2e24; }
+.warn-text { color: #a54800; }

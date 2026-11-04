@@ -165,6 +165,7 @@ function StatusTag({ status }) {
 function ImpactCard({ r, isAdmin, onDone, onError }) {
   const [busy, setBusy] = useState(false);
   const suggestions = r.affected.filter((a) => a.suggestion).length;
+  const needPerson = r.affected.filter((a) => a.needsReview).length;
   const exportRetest = async () => {
     const files = await invoke('exportCsv', { ids: r.affected.map((a) => a.id) });
     files.forEach((csv, i) => download(`retest-${r.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}${files.length > 1 ? `-${i + 1}` : ''}.csv`, csv));
@@ -212,7 +213,14 @@ function ImpactCard({ r, isAdmin, onDone, onError }) {
               <td>{a.question}</td>
               <td>{a.expected}</td>
               <td><StatusTag status={a.status} />{a.reasons?.length > 0 && <div className="muted small">{a.reasons.join('; ')}</div>}</td>
-              <td>{a.suggestion || <span className="muted">-</span>}</td>
+              <td>
+                {a.suggestion ||
+                  (a.needsReview ? (
+                    <span className="warn-text">Needs a person: this answer decides from how long ago the customer got the item, so changing the number alone could flip it.</span>
+                  ) : (
+                    <span className="muted">-</span>
+                  ))}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -226,6 +234,11 @@ function ImpactCard({ r, isAdmin, onDone, onError }) {
           <button className="subtle" disabled={busy} onClick={() => accept(false)}>Accept edit without changes</button>
         )}
       </div>
+      {needPerson > 0 && (
+        <p className="muted small">
+          {needPerson} {needPerson === 1 ? 'answer needs' : 'answers need'} a person and {needPerson === 1 ? 'is' : 'are'} left as they are. Mark {needPerson === 1 ? 'it' : 'them'} Not golden or rewrite before the next re-test.
+        </p>
+      )}
     </div>
   );
 }

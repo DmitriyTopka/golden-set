@@ -128,3 +128,30 @@ export function suggestFix(expected, outdatedFacts) {
   }
   return changed ? out : null;
 }
+
+// "three weeks ago", "25 days ago", "a month ago", "last month": how long ago the customer bought or got the item.
+const COUNT = '(?:\\d+|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a few|few|several|a couple of)';
+const ELAPSED = new RegExp(`\\b(?:(?:about|around|almost|nearly|over|just over|more than|less than)\\s+)?${COUNT}\\s+(?:day|week|month|year)s?\\s+ago\\b|\\blast\\s+(?:week|month|year)\\b`, 'i');
+// A sentence that decides the case: yes or no, still in time, too late, within or outside the window.
+const VERDICT = /^\s*(?:yes|no)\b|\b(?:still|in time|too late|no longer|already|expired|within the window|outside the window|not eligible|eligible|you cannot|you can't)\b/i;
+// The same words inside a condition do not decide anything: "If it arrived less than 30 days ago you can still return it."
+const CONDITION = /\b(?:if|as long as|unless|provided that|when)\b/i;
+
+/** True when the answer gives a verdict that was worked out from the elapsed time in the question. */
+export function verdictDependsOnElapsedTime(question, expected) {
+  if (!ELAPSED.test(String(question || ''))) return false;
+  return splitSentences(String(expected || '')).some((s) => VERDICT.test(s) && !CONDITION.test(s));
+}
+
+/**
+ * Suggested expected answer for one pair. Swapping the number is only safe when nothing else in the
+ * answer was derived from it: "arrived three weeks ago ... you are still in time" stays true with
+ * 30 days and becomes false with 14, so such answers go to a person instead.
+ * @param {{question:string, expected:string}} pair
+ * @returns {{suggestion: string|null, needsReview: string|null}}
+ */
+export function suggestAnswer(pair, outdatedFacts) {
+  const suggestion = suggestFix(pair.expected, outdatedFacts);
+  if (suggestion && verdictDependsOnElapsedTime(pair.question, pair.expected)) return { suggestion: null, needsReview: 'verdict_depends_on_elapsed_time' };
+  return { suggestion, needsReview: null };
+}

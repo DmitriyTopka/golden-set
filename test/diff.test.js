@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { diffArticle, computeImpact, suggestFix, IMPACT } from '../core/diff.js';
+import { diffArticle, computeImpact, suggestFix, suggestAnswer, IMPACT } from '../core/diff.js';
 import { selectGoldenSet, pairsByPage } from '../core/select.js';
 
 const RETURNS = [
@@ -140,5 +140,48 @@ describe('suggestFix', () => {
   });
   test('does not touch other numbers that only look similar', () => {
     expect(suggestFix('Order 1300 items within 30 days of delivery.', d.outdatedFacts)).toBe('Order 1300 items within 14 days of delivery.');
+  });
+});
+
+// Found in the E4 end-to-end run: swapping only the number flipped the verdict of NS-2.
+describe('suggestAnswer', () => {
+  const d = diffArticle(RETURNS, edit('30 days', '14 days'));
+  const pair = (question, expected) => ({ question, expected });
+
+  test('NS-2: a verdict that depends on how long ago the item arrived goes to a human', () => {
+    const r = suggestAnswer(
+      pair('Can I still return my smartwatch? It arrived about three weeks ago and I do not like the strap.', 'You have 30 days from delivery to return it, so you are still in time.'),
+      d.outdatedFacts,
+    );
+    expect(r).toEqual({ suggestion: null, needsReview: 'verdict_depends_on_elapsed_time' });
+  });
+
+  test('other elapsed-time wordings and verdicts', () => {
+    const review = (q, a) => suggestAnswer(pair(q, a), d.outdatedFacts).needsReview;
+    expect(review('Delivered 25 days ago, can I return it?', 'Yes, you can still return it within 30 days.')).toBe('verdict_depends_on_elapsed_time');
+    expect(review('It came last month.', 'Sorry, it is too late: the window is 30 days.')).toBe('verdict_depends_on_elapsed_time');
+    expect(review('Bought it two weeks ago.', 'No problem, 30 days from delivery, you are within the window.')).toBe('verdict_depends_on_elapsed_time');
+  });
+
+  test('a conditional answer is still safe to update (NS-6)', () => {
+    const r = suggestAnswer(
+      pair('Returning an unopened monitor. Monitor still sealed, delivered last month.', 'Our window is 30 days from delivery. If it arrived less than 30 days ago you can still return it.'),
+      d.outdatedFacts,
+    );
+    expect(r).toEqual({ suggestion: 'Our window is 14 days from delivery. If it arrived less than 14 days ago you can still return it.', needsReview: null });
+  });
+
+  test('a plain fact next to an elapsed time is still updated (NS-3)', () => {
+    const r = suggestAnswer(pair('Too late to return a keyboard? The keyboard was delivered 25 days ago, unopened.', 'The return window is 30 days from delivery.'), d.outdatedFacts);
+    expect(r).toEqual({ suggestion: 'The return window is 14 days from delivery.', needsReview: null });
+  });
+
+  test('a verdict without any elapsed time in the question is updated (NS-8)', () => {
+    const r = suggestAnswer(pair('Do you accept returns on sale items? I bought the earphones case in the autumn sale.', 'Yes, sale items have the same 30-day return window.'), d.outdatedFacts);
+    expect(r).toEqual({ suggestion: 'Yes, sale items have the same 14-day return window.', needsReview: null });
+  });
+
+  test('no number to swap means neither a suggestion nor a review flag', () => {
+    expect(suggestAnswer(pair('Arrived three weeks ago.', 'Returns are free.'), d.outdatedFacts)).toEqual({ suggestion: null, needsReview: null });
   });
 });
