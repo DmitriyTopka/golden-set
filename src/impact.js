@@ -40,9 +40,15 @@ async function readProperty(pageId) {
  */
 export async function publishByline(pageId, projectKey, counts) {
   const existing = await readProperty(pageId);
-  const projects = { ...(existing?.value?.projects || {}) };
-  if (counts) projects[projectKey] = counts;
-  else delete projects[projectKey];
+  // Content properties can be edited by anyone who can edit the page, so nothing read back is
+  // trusted: keep only projects this installation knows, with sane counts.
+  const known = new Set(await registeredProjects());
+  const count = (n) => (Number.isInteger(n) && n >= 0 && n < 100000 ? n : 0);
+  const projects = {};
+  for (const [key, c] of Object.entries(existing?.value?.projects || {})) {
+    if (known.has(key) && key !== projectKey) projects[key] = { total: count(c?.total), outdated: count(c?.outdated) };
+  }
+  if (counts) projects[projectKey] = { total: count(counts.total), outdated: count(counts.outdated) };
   const total = Object.values(projects).reduce((n, c) => n + c.total, 0);
   const outdated = Object.values(projects).reduce((n, c) => n + c.outdated, 0);
   const value = {
@@ -69,9 +75,11 @@ export async function saveBaselines(db, articles) {
   for (const a of articles) await db.set(`snap:${a.pageId}`, { version: a.version, title: a.title, text: stripMarkup(a.body) });
 }
 
-async function currentPage(pageId) {
+async function currentPage(pageId, spaceId) {
   const p = await call('app', 'confluence', route`/wiki/api/v2/pages/${pageId}?body-format=storage`, { allow404: true });
-  return p ? { version: p.version?.number || 0, title: p.title, text: stripMarkup(p.body?.storage?.value || '') } : null;
+  // Only pages of the connected knowledge base: a page id from anywhere else is treated as missing.
+  if (!p || (spaceId && String(p.spaceId) !== String(spaceId))) return null;
+  return { version: p.version?.number || 0, title: p.title, text: stripMarkup(p.body?.storage?.value || '') };
 }
 
 /**
@@ -81,12 +89,12 @@ async function currentPage(pageId) {
 export async function checkPage(projectKey, pageId) {
   const db = forProject(projectKey);
   const id = String(pageId);
-  const [baseline, selected] = await Promise.all([db.get(`snap:${id}`), db.getList('pairs:selected')]);
+  const [baseline, selected, cfg] = await Promise.all([db.get(`snap:${id}`), db.getList('pairs:selected'), db.get('config')]);
   const pairs = selected.filter((p) => p.link?.pageId === id);
   if (!baseline) return { record: null, reason: 'no_baseline' };
   if (pairs.length === 0) return { record: null, reason: 'no_pairs' };
 
-  const current = await currentPage(id);
+  const current = await currentPage(id, cfg?.spaceId);
   if (!current) return { record: null, reason: 'page_not_found' };
   if (current.version === baseline.version) return { record: null, reason: 'no_change' };
   const diff = diffArticle(baseline.text, current.text);
@@ -148,7 +156,8 @@ export async function acceptEdit(projectKey, pageId, { applySuggestions }) {
     const selected = await db.getList('pairs:selected');
     await db.setList('pairs:selected', selected.map((p) => (fixes.has(p.id) ? { ...p, expected: fixes.get(p.id), updatedFrom: p.expected } : p)));
   }
-  const current = await currentPage(id);
+  const cfg = await db.get('config');
+  const current = await currentPage(id, cfg?.spaceId);
   if (current) await db.set(`snap:${id}`, current);
   await db.del(`impact:${id}`);
   await db.set('impacts', ((await db.get('impacts')) || []).filter((x) => x !== id));

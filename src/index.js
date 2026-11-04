@@ -252,7 +252,10 @@ resolver.define('markNotGolden', async ({ payload, context }) => {
 
 resolver.define('getImpacts', async ({ context }) => {
   const db = await readerDb(context);
-  const impacts = await listImpacts(db);
+  // Pages inside the space can carry their own restrictions: show only impacts on pages the caller can read.
+  const all = await listImpacts(db);
+  const readable = await Promise.all(all.map((r) => call('user', 'confluence', route`/wiki/api/v2/pages/${r.pageId}`, { allow404: true }).then((p) => Boolean(p?.id)).catch(() => false)));
+  const impacts = all.filter((_, i) => readable[i]);
   const ids = [...new Set(impacts.flatMap((r) => r.affected.map((a) => a.id)))];
   const visible = await visibleKeys(ids);
   return impacts.map((r) => {
@@ -265,7 +268,8 @@ resolver.define('checkNow', async ({ payload, context }) => {
   const { projectKey } = await guard(context, 'admin');
   const res = await checkPage(projectKey, payload.pageId);
   console.log(`checkNow ${projectKey} page ${payload.pageId}: ${res.reason}`);
-  return res;
+  // The UI reloads impacts through getImpacts, which applies the per-user filters.
+  return { reason: res.reason };
 });
 
 // Opening the page checks for article edits at once, so nobody waits for the five-minute schedule.
