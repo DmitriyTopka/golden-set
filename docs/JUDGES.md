@@ -28,7 +28,7 @@ If the page says "Installation failed" in Jira, wait a minute and try again. We 
 4. Look at **4. Golden pairs**. Each answer comes from a resolved request. Golden Set replaces personal data with [email], [phone] and so on, and shows the article each pair relies on. Try the **Help article** filter, **Not golden**, and **Edit** on an answer.
 5. Open the Confluence page **Returns policy** in your space. Change "within 30 days of delivery" to "within 14 days of delivery" and publish.
 6. Back in Golden Set, reload the page (or pick the article and press **Check now**). Section **3. Article changes** says that 12 golden answers depend on this page and 8 are likely outdated, shows the change "30 days -> 14 days" and a suggested new answer for each.
-   One answer (NS-2, "it arrived about three weeks ago") gets no suggestion and is marked **Needs a person**: changing only the number would flip its verdict. Rewrite it with **Edit**.
+   One answer (the smartwatch that "arrived about three weeks ago") gets no suggestion and is marked **Needs a person**: changing only the number would flip its verdict. Rewrite it with **Edit**.
 7. Press **Apply suggested answers and accept edit**, or **Download re-test CSV** first.
 8. In Confluence, the line under the article title shows the Golden Set count, for example "Golden Set: 8 of 12 answers may be outdated".
 
