@@ -12,7 +12,7 @@ See which support answers break when you edit a help article.
 
 ## Category and bonus
 
-- Category: Apps for Business Teams (support teams). Alternative: Apps for Specialized Industries, if Dima picks it.
+- Category: Apps for Business Teams (support teams). Decided by Dima on 04.11.
 - Bonus prize: Best Agents - Rovo/Assignable agents (rovo:agent module with three rovo:action modules).
 
 ## Inspiration
