@@ -3,3 +3,4 @@ coverage/
 *.log
 .env
 out/
+static/ui/dist/

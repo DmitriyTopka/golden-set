@@ -1,0 +1,32 @@
+modules:
+  jiraServiceManagement:queuePage:
+    - key: golden-set-queue-page
+      resource: main
+      resolver:
+        function: resolver
+      title: Golden Set
+  function:
+    - key: resolver
+      handler: index.handler
+resources:
+  - key: main
+    path: static/ui/dist
+permissions:
+  scopes:
+    - read:servicedesk-request
+    - write:servicedesk-request
+    - manage:servicedesk-customer
+    - read:jira-work
+    - write:jira-work
+    - read:jira-user
+    - read:confluence-content.summary
+    - read:page:confluence
+    - write:page:confluence
+    - read:space:confluence
+    - storage:app
+app:
+  runtime:
+    name: nodejs24.x
+    memoryMB: 256
+    architecture: arm64
+  id: ari:cloud:ecosystem::app/c4b582c2-566a-4180-9837-2917cd0f3d87

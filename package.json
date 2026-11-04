@@ -9,15 +9,35 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "seed:generate": "node seed/generate.mjs",
-    "seed:verify": "node seed/verify.mjs"
+    "seed:verify": "node seed/verify.mjs",
+    "ui:build": "cd static/ui && npm run build",
+    "forge": "bin/forge"
   },
   "jest": {
     "testEnvironment": "node",
     "transform": {},
-    "collectCoverageFrom": ["core/**/*.js"],
-    "coverageThreshold": { "global": { "lines": 80, "branches": 70, "functions": 80 } }
+    "collectCoverageFrom": [
+      "core/**/*.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 80,
+        "branches": 70,
+        "functions": 80
+      }
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/static/"
+    ]
   },
   "devDependencies": {
     "jest": "30.5.2"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@forge/api": "8.4.0",
+    "@forge/kvs": "2.1.1",
+    "@forge/resolver": "2.0.2"
   }
 }
