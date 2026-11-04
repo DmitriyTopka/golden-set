@@ -33,6 +33,10 @@ Golden Set predicted which 8 answers would break before any evaluation was run, 
    that depends on the number. Proposed fix (E5): when the question has an elapsed time ("three weeks ago",
    "25 days ago", "last month") and the answer has a verdict ("still in time", "too late", "you can still"),
    give no suggestion and mark the pair "needs a human look" instead. Apply then skips it.
+   **Fixed the same day (7b7fdf1):** core/diff.js `suggestAnswer`. Checked on the live site with the article at 14 days:
+   NS-2 shows "Needs a person", the button reads "Apply 7 suggested answers", the Rovo agent says a person should
+   rewrite NS-2 (docs/e2e/11-ns2-needs-a-person.png, 12-rovo-ns2-note.jpg). The other 7 suggestions are unchanged.
+   Conditional answers like NS-6 ("If it arrived less than 30 days ago you can still return it") keep their suggestion.
 2. **NS-8 sale items, a knowledge base gap, not a Golden Set bug.** The expected answer ("sale items have the same
    return window") came from a human agent's resolved request. The Returns policy article never mentions sale items,
    so the Rovo agent correctly said it could not confirm and passed the request on. Golden Set could surface this
@@ -50,6 +54,12 @@ Screenshots in docs/e2e/:
 
 Runs #001 and #002 and the Rovo agent answer were checked live earlier the same day; their screenshots are not
 in this folder and will be taken again for the video in E6.
+
+## Security fix from the same day
+
+An automated review found that the Rovo actions checked only Jira browse permission, while the Golden Set page also
+checks access to the knowledge base space and per-page restrictions. Both now use one gate, src/access.js
+(readerAccess, readableImpacts, canReadPage, visibleKeys), so the agent never says more than the page would.
 
 ## Not verified
 

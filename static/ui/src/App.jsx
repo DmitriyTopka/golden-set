@@ -236,7 +236,9 @@ function ImpactCard({ r, isAdmin, onDone, onError }) {
       </div>
       {needPerson > 0 && (
         <p className="muted small">
-          {needPerson} {needPerson === 1 ? 'answer needs' : 'answers need'} a person and {needPerson === 1 ? 'is' : 'are'} left as they are. Mark {needPerson === 1 ? 'it' : 'them'} Not golden or rewrite before the next re-test.
+          {needPerson === 1
+            ? '1 answer needs a person and is left as it is. Mark it Not golden or rewrite it before the next re-test.'
+            : `${needPerson} answers need a person and are left as they are. Mark them Not golden or rewrite them before the next re-test.`}
         </p>
       )}
     </div>
