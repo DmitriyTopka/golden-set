@@ -48,3 +48,4 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .editor textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; font: inherit; color: var(--text); resize: vertical; margin-bottom: 6px; }
 .banner { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; margin-bottom: 16px; border-radius: 6px; background: #ffeceb; color: var(--error); }
 .row.tight { gap: 12px; align-items: center; }
+.hint { margin: 12px 0 0; padding: 8px 12px; border-radius: 6px; background: #e9f2ff; color: #0055cc; }

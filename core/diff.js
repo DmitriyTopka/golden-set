@@ -71,7 +71,8 @@ export function computeImpact(pairs, diff) {
   const removedTerms = new Set(diff.removedTerms);
 
   const affected = pairs.map((p) => {
-    const text = `${p.answerOriginal} ${p.expected}`;
+    // An answer rewritten by an admin is the truth; the agent's original reply no longer counts.
+    const text = p.edited ? p.expected : `${p.answerOriginal} ${p.expected}`;
     const hitFacts = [...factKeys(text)].filter((k) => outdatedKeys.has(k));
     const hitTerms = [...extractTerms(text)].filter((t) => removedTerms.has(t));
     let status = IMPACT.RECHECK;

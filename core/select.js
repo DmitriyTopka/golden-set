@@ -63,14 +63,21 @@ export function balancedTop(pairs, limit = DEFAULT_LIMIT) {
  * @param {{ limit?: number, excluded?: Set<string> }} [opts] excluded = pairs an admin marked "not golden"
  */
 export function selectGoldenSet(requests, articles, opts = {}) {
+  return selectFromCandidates(requests.map(buildCandidate), articles, opts);
+}
+
+/**
+ * Same as selectGoldenSet, from buildCandidate results. The scan builds candidates batch by batch, so
+ * only redacted text is ever stored, never the raw request.
+ */
+export function selectFromCandidates(results, articles, opts = {}) {
   const limit = opts.limit ?? DEFAULT_LIMIT;
   const excluded = opts.excluded || new Set();
   const index = indexArticles(articles);
   const rejected = [];
   const candidates = [];
 
-  for (const r of requests) {
-    const res = buildCandidate(r);
+  for (const res of results) {
     if (!res.ok) {
       rejected.push({ id: res.key, reason: res.reason });
       continue;
@@ -95,7 +102,7 @@ export function selectGoldenSet(requests, articles, opts = {}) {
     rejected,
     duplicates,
     stats: {
-      requests: requests.length,
+      requests: results.length,
       candidates: candidates.length,
       rejected: rejected.length,
       duplicates: duplicates.length,

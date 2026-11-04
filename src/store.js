@@ -1,5 +1,5 @@
 // App storage in Forge KVS. Large lists are split into chunks to stay well below the value size limit.
-import { kvs } from './forge.js';
+import { kvs, WhereConditions } from './forge.js';
 
 const CHUNK = 40;
 
@@ -33,6 +33,20 @@ export async function clearList(prefix) {
   await kvs.delete(`${prefix}:count`);
 }
 
+/** Every value whose key starts with the prefix. No shared index key, so parallel writers cannot lose entries. */
+export async function valuesByPrefix(prefix) {
+  const out = [];
+  let cursor;
+  do {
+    let q = kvs.query().where('key', WhereConditions.beginsWith(prefix)).limit(100);
+    if (cursor) q = q.cursor(cursor);
+    const page = await q.getMany();
+    out.push(...page.results.map((r) => r.value));
+    cursor = page.nextCursor;
+  } while (cursor);
+  return out;
+}
+
 /**
  * Storage view for one JSM project: every key is prefixed with the project key, so each service
  * project keeps its own golden set and settings.
@@ -47,5 +61,6 @@ export function forProject(projectKey) {
     getList: (k) => getList(p(k)),
     appendChunk: (k, i, items) => appendChunk(p(k), i, items),
     clearList: (k) => clearList(p(k)),
+    valuesByPrefix: (k) => valuesByPrefix(p(k)),
   };
 }

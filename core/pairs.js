@@ -69,6 +69,10 @@ export function cleanQuestion(summary, description, names = []) {
 /**
  * @returns {{ ok: true, pair: object } | { ok: false, key: string, reason: string }}
  */
+// A pasted log or a long thread must not push a stored list over the storage value limit.
+export const MAX_TEXT = 1500;
+const cap = (t) => (t.length > MAX_TEXT ? `${t.slice(0, MAX_TEXT - 1).trimEnd()}…` : t);
+
 export function buildCandidate(request) {
   const reporterId = request.reporter?.id;
   const comments = [...(request.comments || [])].filter((c) => c.public).sort(byCreated);
@@ -100,10 +104,10 @@ export function buildCandidate(request) {
     ok: true,
     pair: {
       id: request.key,
-      summary: normalizeSpace(redactPII(request.summary || '', { names })),
-      question,
-      answerOriginal: normalizeSpace(answerClean),
-      expected,
+      summary: cap(normalizeSpace(redactPII(request.summary || '', { names }))),
+      question: cap(question),
+      answerOriginal: cap(normalizeSpace(answerClean)),
+      expected: cap(expected),
       refs,
       signals: {
         csat: request.csat ?? null,

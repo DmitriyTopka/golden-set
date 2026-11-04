@@ -2,7 +2,7 @@
 // Each action answers only with what the asking user could see in Jira themselves.
 import { registeredProjects, listImpacts } from './impact.js';
 import { toCsv } from '../core/index.js';
-import { readerAccess, readableImpacts, visibleKeys, canReadPage } from './access.js';
+import { readerAccess, readableImpacts, visibleKeys, onReadablePages } from './access.js';
 
 /**
  * Projects the asking user may read: the same gate as the Golden Set page (browse permission in Jira
@@ -17,20 +17,14 @@ async function myProjects() {
   return out;
 }
 
-/** Pairs on pages the user cannot read are left out, like on the Golden Set page. */
-async function onReadablePages(pairs) {
-  const pages = [...new Set(pairs.map((p) => p.link?.pageId).filter(Boolean))];
-  const ok = new Set();
-  for (const id of pages) if (await canReadPage(id)) ok.add(id);
-  return pairs.filter((p) => p.link?.pageId && ok.has(p.link.pageId));
-}
-
-const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+// Letters of any script, so a Cyrillic or Greek title is not reduced to an empty string.
+const norm = (s) => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
 
 function matchesArticle(title, wanted) {
   if (!wanted) return true;
   const a = norm(title);
   const b = norm(wanted);
+  if (!a || !b) return false;
   return a === b || a.includes(b) || b.includes(a);
 }
 
@@ -98,7 +92,8 @@ export async function getRetestCsv(payload) {
   if (rows.length === 0) return 'There is nothing to re-test for that article.';
   return {
     howToUse: 'Save this as a .csv file and upload it in Rovo Studio: your agent, Evaluation, Create dataset. Then run Response accuracy.',
-    rows: rows.length,
+    rows: Math.min(rows.length, 100),
+    ...(rows.length > 100 ? { note: `${rows.length} answers rely on this article; this file has the first 100, the Evaluations limit. Download the rest from the Golden Set page.` } : {}),
     csv: toCsv(rows.slice(0, 100)),
   };
 }

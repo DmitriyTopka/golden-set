@@ -3,8 +3,13 @@ import { route } from './forge.js';
 import { call, mapLimit } from './http.js';
 
 export async function listServiceDesks() {
-  const res = await call('app', 'jira', route`/rest/servicedeskapi/servicedesk?limit=50`);
-  return (res?.values || []).map((d) => ({ id: String(d.id), projectKey: d.projectKey, name: d.projectName }));
+  const out = [];
+  for (let start = 0; ; start += 50) {
+    const res = await call('app', 'jira', route`/rest/servicedeskapi/servicedesk?start=${start}&limit=50`);
+    out.push(...(res?.values || []).map((d) => ({ id: String(d.id), projectKey: d.projectKey, name: d.projectName })));
+    if (!res || res.isLastPage !== false) break;
+  }
+  return out;
 }
 
 /** Status id -> category key ('new' | 'indeterminate' | 'done'), needed to read the changelog. */
@@ -41,6 +46,20 @@ async function allComments(key) {
   return out;
 }
 
+/**
+ * Account type of each comment author ("atlassian" for agents, "customer" for portal customers,
+ * "app" for bots). The JSM comment API leaves it out, the platform API has it under the same comment id.
+ */
+async function authorTypes(key) {
+  const out = new Map();
+  for (let startAt = 0; ; startAt += 100) {
+    const res = await call('app', 'jira', route`/rest/api/3/issue/${key}/comment?startAt=${startAt}&maxResults=100`).catch(() => null);
+    for (const c of res?.comments || []) out.set(String(c.id), c.author?.accountType);
+    if (!res || startAt + 100 >= (res.total ?? 0)) break;
+  }
+  return out;
+}
+
 async function statusHistory(key, categories) {
   const out = [];
   for (let startAt = 0; ; startAt += 100) {
@@ -68,9 +87,10 @@ const fieldText = (request, id) => {
 
 /** One closed request in the core shape. */
 export async function readRequest(key, categories) {
-  const [request, comments, history, feedback, issue] = await Promise.all([
+  const [request, comments, types, history, feedback, issue] = await Promise.all([
     call('app', 'jira', route`/rest/servicedeskapi/request/${key}`),
     allComments(key),
+    authorTypes(key),
     statusHistory(key, categories),
     call('app', 'jira', route`/rest/servicedeskapi/request/${key}/feedback`, { allow404: true }).catch(() => null),
     call('app', 'jira', route`/rest/api/3/issue/${key}?fields=resolutiondate`),
@@ -85,7 +105,7 @@ export async function readRequest(key, categories) {
     csat: feedback?.rating ?? null,
     comments: comments.map((c) => ({
       id: String(c.id),
-      author: { id: c.author?.accountId, name: c.author?.displayName },
+      author: { id: c.author?.accountId, name: c.author?.displayName, accountType: types.get(String(c.id)) },
       public: c.public !== false,
       body: c.body || '',
       created: c.created?.iso8601 || c.created,

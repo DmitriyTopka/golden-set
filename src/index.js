@@ -6,14 +6,14 @@
 // scan, demo data, "not golden" marks) needs "Administer projects". Permissions are checked as the
 // calling user, while bulk reads run as the app.
 import { Resolver, route } from './forge.js';
-import { call } from './http.js';
+import { call, mapLimit } from './http.js';
 import { forProject } from './store.js';
 import { listServiceDesks, statusCategories, closedRequestKeys, readRequests } from './jsm.js';
 import { readArticles } from './confluence.js';
 import { seedNext, seedState, resetSeed } from './seed.js';
-import { registerProject, publishByline, readByline, saveBaselines, checkPage, checkProject, listImpacts, acceptEdit } from './impact.js';
-import { selectGoldenSet, reselect, toCsvChunks, cleanExpected, applyEdits, undoEdit } from '../core/index.js';
-import { permissions, canSeeSpace, visibleKeys, readableImpacts } from './access.js';
+import { registerProject, publishByline, readByline, saveBaselines, checkPage, checkProject, listImpacts, clearImpacts, acceptEdit } from './impact.js';
+import { selectFromCandidates, buildCandidate, reselect, toCsvChunks, cleanExpected, applyEdits, undoEdit } from '../core/index.js';
+import { permissions, canSeeSpace, visibleKeys, readableImpacts, onReadablePages } from './access.js';
 
 const resolver = new Resolver();
 const SCAN_BATCH = 10;
@@ -45,14 +45,9 @@ async function clearResults(db, projectKey) {
   await Promise.all(Object.keys(versions).map((id) => db.del(`snap:${id}`)));
   const dropped = await registerProject(projectKey, []);
   for (const id of dropped) await publishByline(id, projectKey, null).catch(() => null);
-  await Promise.all([...PAIR_LISTS.map((k) => db.clearList(k)), ...PAIR_KEYS.map((k) => db.del(k))]);
+  await Promise.all([...PAIR_LISTS.map((k) => db.clearList(k)), db.clearList('cand'), ...PAIR_KEYS.map((k) => db.del(k))]);
 }
 
-async function clearImpacts(db) {
-  const ids = (await db.get('impacts')) || [];
-  await Promise.all(ids.map((id) => db.del(`impact:${id}`)));
-  await db.del('impacts');
-}
 
 resolver.define('getOverview', async ({ context }) => {
   const { projectKey, perms, db } = await guard(context, 'browse');
@@ -65,15 +60,23 @@ resolver.define('getOverview', async ({ context }) => {
     config: cfg && (perms.admin ? cfg : { spaceName: cfg.spaceName, projectName: cfg.projectName }),
     seed: perms.admin ? seed : brief(seed),
     scan: perms.admin ? scan || { phase: 'idle' } : brief(scan),
-    summary: summary || null,
+    // Readers see the numbers only with access to the knowledge base space, like the pairs themselves.
+    summary: summary && (perms.admin || !summary.spaceId || (await canSeeSpace(summary.spaceId))) ? summary : null,
   };
 });
 
 resolver.define('listSources', async ({ context }) => {
   await guard(context, 'admin');
   // Spaces are listed as the user, so an admin only picks from spaces they can read.
-  const res = await call('user', 'confluence', route`/wiki/api/v2/spaces?limit=100&type=global`);
-  return { spaces: (res?.results || []).map((s) => ({ id: String(s.id), key: s.key, name: s.name })) };
+  const spaces = [];
+  let cursor = null;
+  do {
+    const res = await call('user', 'confluence', cursor ? route`/wiki/api/v2/spaces?limit=100&type=global&cursor=${cursor}` : route`/wiki/api/v2/spaces?limit=100&type=global`);
+    spaces.push(...(res?.results || []).map((s) => ({ id: String(s.id), key: s.key, name: s.name })));
+    const next = res?._links?.next;
+    cursor = next ? new URL(next, 'https://x').searchParams.get('cursor') : null;
+  } while (cursor && spaces.length < 2000);
+  return { spaces: spaces.sort((a, b) => a.name.localeCompare(b.name)) };
 });
 
 resolver.define('saveConfig', async ({ payload, context }) => {
@@ -117,7 +120,8 @@ resolver.define('scanStart', async ({ context }) => {
   const cfg = await configOf(db);
   if (!cfg) throw new Error('Choose a knowledge base space first.');
   const keys = await closedRequestKeys(cfg.projectKey);
-  await db.clearList('raw');
+  await db.clearList('cand');
+  await db.clearList('raw'); // left by versions that stored whole requests
   const st = { phase: 'reading', keys, done: 0, startedAt: new Date().toISOString() };
   await db.set('scan:state', st);
   return { phase: st.phase, total: keys.length, done: 0 };
@@ -129,8 +133,9 @@ resolver.define('scanBatch', async ({ context }) => {
   if (!st || st.phase !== 'reading') return st;
   const categories = await statusCategories();
   const batch = st.keys.slice(st.done, st.done + SCAN_BATCH);
-  const requests = await readRequests(batch, categories);
-  await db.appendChunk('raw', Math.floor(st.done / SCAN_BATCH), requests);
+  // Each request is turned into a redacted candidate (or a rejection) at once: raw customer text is never stored.
+  const results = (await readRequests(batch, categories)).map(buildCandidate);
+  await db.appendChunk('cand', Math.floor(st.done / SCAN_BATCH), results);
   st.done += batch.length;
   if (st.done >= st.keys.length) st.phase = 'selecting';
   await db.set('scan:state', st);
@@ -141,12 +146,18 @@ resolver.define('scanFinish', async ({ context }) => {
   const { db } = await guard(context, 'admin');
   const cfg = await configOf(db);
   const st = await db.get('scan:state');
-  const [requests, articles, excludedList, edits] = await Promise.all([db.getList('raw'), readArticles(cfg.spaceId), db.get('excluded'), db.get('edits')]);
-  const result = selectGoldenSet(requests, articles);
+  const [results, articles, excludedList, edits, previousVersions] = await Promise.all([
+    db.getList('cand'),
+    readArticles(cfg.spaceId),
+    db.get('excluded'),
+    db.get('edits'),
+    db.get('articles:versions'),
+  ]);
+  const result = selectFromCandidates(results, articles);
   const titles = Object.fromEntries(articles.map((a) => [a.pageId, a.title]));
   const withTitles = (p) => ({ ...p, articleTitle: p.link ? titles[p.link.pageId] : null });
   // "Not golden" marks survive a rescan: excluded pairs are parked, not lost, so they can be restored.
-  // Answers rewritten by an admin survive a rescan the same way.
+  // Answers rewritten by an admin, and applied suggestions, survive a rescan the same way.
   const next = reselect(applyEdits([...result.selected, ...result.reserve].map(withTitles), edits), new Set(excludedList || []));
 
   await db.setList('pairs:selected', next.selected);
@@ -154,19 +165,21 @@ resolver.define('scanFinish', async ({ context }) => {
   await db.setList('pairs:excluded', next.excluded);
   await db.set('pairs:rejected', result.rejected);
   await db.set('pairs:duplicates', result.duplicates);
-  await db.set('articles:versions', Object.fromEntries(articles.map((a) => [a.pageId, a.version])));
-  // Fresh pairs were written against today's articles: they become the baseline for edit checks.
-  await clearImpacts(db);
-  await saveBaselines(db, articles);
   const usedPages = [...new Set(next.selected.map((p) => p.link?.pageId).filter(Boolean))];
-  const dropped = await registerProject(cfg.projectKey, usedPages);
-  for (const id of usedPages) await publishByline(id, cfg.projectKey, { total: next.selected.filter((p) => p.link?.pageId === id).length, outdated: 0 });
-  for (const id of dropped) await publishByline(id, cfg.projectKey, null).catch(() => null);
-  // Raw requests carry unredacted customer text; keep only the redacted pairs once selection is done.
-  await db.clearList('raw');
+  // Baselines only for pages the set relies on. A page that already has one keeps it: the answers were
+  // written against that text, and an edit that is still open must not vanish because of a rescan.
+  const known = previousVersions || {};
+  await saveBaselines(db, articles.filter((a) => usedPages.includes(a.pageId) && !known[a.pageId]));
+  await db.set('articles:versions', Object.fromEntries(usedPages.map((id) => [id, known[id] ?? articles.find((a) => a.pageId === id)?.version])));
+  for (const r of await listImpacts(db)) if (!usedPages.includes(r.pageId)) await db.del(`impact:${r.pageId}`);
+  await db.clearList('cand');
   const summary = { ...result.stats, selected: next.selected.length, excludedByAdmin: next.excluded.length, articles: articles.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
   await db.set('result:summary', summary);
-  await db.set('scan:state', { phase: 'done', total: st?.keys?.length || requests.length, done: requests.length });
+  await db.set('scan:state', { phase: 'done', total: st?.keys?.length || results.length, done: results.length });
+  const dropped = await registerProject(cfg.projectKey, usedPages);
+  // Bylines are best effort: the set is already saved, and the next check publishes them again.
+  await mapLimit(usedPages, 4, (id) => publishByline(id, cfg.projectKey, { total: next.selected.filter((p) => p.link?.pageId === id).length, outdated: 0 }).catch(() => null));
+  await mapLimit(dropped, 4, (id) => publishByline(id, cfg.projectKey, null).catch(() => null));
   return summary;
 });
 
@@ -196,10 +209,12 @@ resolver.define('getPairs', async ({ context }) => {
   const all = [...selected, ...reserve, ...excluded, ...(rejected || []), ...(duplicates || [])].map((x) => x.id).concat((duplicates || []).map((d) => d.duplicateOf));
   const visible = await visibleKeys([...new Set(all)]);
   const seen = (x) => visible.has(x.id);
+  // Pages inside the space can carry their own restrictions: pairs tied to a page the user cannot read stay hidden.
+  const [sel, res, exc] = await Promise.all([selected, reserve, excluded].map((l) => onReadablePages(l.filter(seen))));
   return {
-    selected: selected.filter(seen),
-    reserve: reserve.filter(seen),
-    excluded: excluded.filter(seen),
+    selected: sel,
+    reserve: res,
+    excluded: exc,
     rejected: (rejected || []).filter(seen),
     // A duplicate names another request, so both must be visible to the caller.
     duplicates: (duplicates || []).filter((d) => visible.has(d.id) && visible.has(d.duplicateOf)),
@@ -231,7 +246,8 @@ resolver.define('editExpected', async ({ payload, context }) => {
   const id = String(payload?.id || '');
   const lists = await Promise.all(PAIR_LISTS.map((k) => db.getList(k)));
   const pair = lists.flat().find((p) => p.id === id);
-  if (!pair) throw new Error('This pair is not in the golden set any more.');
+  // Same answer for a missing pair and for a request hidden from this admin by issue security.
+  if (!pair || !(await visibleKeys([id])).has(id)) throw new Error('This pair is not in the golden set any more.');
   const edits = { ...((await db.get('edits')) || {}) };
   let change;
   let text;
@@ -252,9 +268,9 @@ resolver.define('editExpected', async ({ payload, context }) => {
   await Promise.all(PAIR_LISTS.map((k, i) => (lists[i].some((p) => p.id === id) ? db.setList(k, lists[i].map((p) => (p.id === id ? change(p) : p))) : null)));
   // An open article edit shows this answer too: show the new text at once and drop its suggestion,
   // so "Apply suggested answers" never overwrites what the admin wrote. The next check recomputes it.
-  for (const pageId of (await db.get('impacts')) || []) {
-    const record = await db.get(`impact:${pageId}`);
-    if (!record?.affected.some((a) => a.id === id)) continue;
+  for (const record of await listImpacts(db)) {
+    const pageId = record.pageId;
+    if (!record.affected.some((a) => a.id === id)) continue;
     record.affected = record.affected.map((a) => (a.id === id ? { ...a, expected: text, suggestion: null, needsReview: null, editedByAdmin: !payload?.undo } : a));
     await db.set(`impact:${pageId}`, record);
   }
@@ -300,14 +316,19 @@ resolver.define('acceptEdit', async ({ payload, context }) => {
 resolver.define('getPageView', async ({ context }) => {
   const pageId = String(context?.extension?.content?.id || '');
   const value = await readByline(pageId);
-  return { pageId, projects: Object.entries(value?.projects || {}).map(([projectKey, c]) => ({ projectKey, ...c })) };
+  // Anyone who can edit the page can edit this property: show only well-formed project keys and counts.
+  const count = (n) => (Number.isInteger(n) && n >= 0 && n < 100000 ? n : 0);
+  const projects = Object.entries(value?.projects || {})
+    .filter(([key]) => /^[A-Z][A-Z0-9_]{0,19}$/.test(key))
+    .map(([projectKey, c]) => ({ projectKey, total: count(c?.total), outdated: Math.min(count(c?.outdated), count(c?.total)) }));
+  return { pageId, projects };
 });
 
 resolver.define('exportCsv', async ({ payload, context }) => {
   const db = await readerDb(context);
   const all = await db.getList('pairs:selected');
   const visible = await visibleKeys(all.map((p) => p.id));
-  const selected = all.filter((p) => visible.has(p.id));
+  const selected = await onReadablePages(all.filter((p) => visible.has(p.id)));
   const ids = payload?.ids ? new Set(payload.ids) : null;
   const rows = ids ? selected.filter((p) => ids.has(p.id)) : selected;
   return toCsvChunks(rows);

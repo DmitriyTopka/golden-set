@@ -188,3 +188,17 @@ describe('suggestAnswer', () => {
     expect(suggestAnswer(pair('Arrived three weeks ago.', 'Returns are free.'), d.outdatedFacts)).toEqual({ suggestion: null, needsReview: null });
   });
 });
+
+describe('computeImpact with edited answers', () => {
+  test('an answer an admin rewrote is judged by its own text, not the old agent reply', () => {
+    const d = diffArticle(RETURNS, edit('30 days', '14 days'));
+    const pairs = [
+      { id: 'NS-2', answerOriginal: 'You have 30 days from delivery, so you are still in time.', expected: 'Three weeks is past our 14-day window.', edited: { from: 'x', at: 't' } },
+      { id: 'NS-3', answerOriginal: 'The return window is 30 days from delivery.', expected: 'The return window is 30 days from delivery.' },
+    ];
+    const r = computeImpact(pairs, d);
+    expect(r.affected.find((a) => a.id === 'NS-2').status).toBe(IMPACT.RECHECK);
+    expect(r.affected.find((a) => a.id === 'NS-3').status).toBe(IMPACT.OUTDATED);
+    expect(r.counts.outdated).toBe(1);
+  });
+});

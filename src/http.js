@@ -30,6 +30,10 @@ export async function call(as, product, url, opts = {}) {
       continue;
     }
     const text = await res.text().catch(() => '');
+    // The usual first-run failure: the app was installed in Jira only.
+    if (as === 'app' && product === 'confluence' && (res.status === 401 || res.status === 403)) {
+      throw new Error(`Golden Set cannot read Confluence (${res.status}). Install the app in Confluence on this site as well; the same install link covers Jira and Confluence.`);
+    }
     throw new Error(`${init.method} ${product} ${res.status}: ${text.slice(0, 300)}`);
   }
 }

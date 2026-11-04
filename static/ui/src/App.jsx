@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { invoke, view } from '@forge/bridge';
 
+const EMPTY_PAIRS = { selected: [], reserve: [], excluded: [], rejected: [], duplicates: [], summary: null };
 const TAGLINE = 'See which support answers break when you edit a help article.';
 const REASONS = {
   no_public_agent_answer: 'No public answer from an agent',
@@ -225,8 +226,9 @@ function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
   const accept = async (applySuggestions) => {
     setBusy(true);
     try {
-      await invoke('acceptEdit', { pageId: r.pageId, applySuggestions });
+      const res = await invoke('acceptEdit', { pageId: r.pageId, applySuggestions });
       await onDone();
+      if (res?.changedAgain) onError(`${r.title} was edited again after this check. The list now shows the latest version; review it and accept again.`);
     } catch (e) {
       onError(e.message);
     } finally {
@@ -381,7 +383,12 @@ function QueueApp() {
       const ov = await invoke('getOverview');
       // Admins check articles on open, so an edit shows up without waiting for the 5-minute schedule.
       if (ov.isAdmin && ov.summary) await invoke('refreshImpacts').catch(() => null);
-      const [pr, im] = await Promise.all([invoke('getPairs'), invoke('getImpacts').catch(() => [])]);
+      // A failed read shows as a banner over the rest of the page, never as an empty "nothing changed".
+      const fail = (fallback) => (e) => {
+        setError(e.message);
+        return fallback;
+      };
+      const [pr, im] = await Promise.all([invoke('getPairs').catch(fail(EMPTY_PAIRS)), invoke('getImpacts').catch(fail([]))]);
       setOverview(ov);
       setPairs(pr);
       setImpacts(im);
@@ -478,6 +485,13 @@ function QueueApp() {
             </button>
             )}
           </div>
+          {!s && overview.seed?.phase !== 'done' && (
+            <p className="muted small">
+              Demo data creates 6 help articles in <b>{overview.config.spaceName}</b> and 80 resolved requests in <b>{overview.config.projectName}</b>.
+              Use a test project and space: requests are raised for demo customers on example.com when you are a Jira admin, otherwise for this project's own customers, and JSM notifies them.
+            </p>
+          )}
+          {!s && overview.seed?.phase === 'done' && <p className="hint">Demo data is ready. Next: <b>Scan resolved requests</b>.</p>}
           {(scan.error || seed.error) && <p className="error">{scan.error || seed.error}</p>}
           {s && (
             <ul className="stats">

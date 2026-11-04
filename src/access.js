@@ -57,3 +57,11 @@ export async function readerAccess(projectKey) {
   if (spaceId && !(await canSeeSpace(spaceId))) return null;
   return { db, perms };
 }
+
+/** Pairs whose help article the user can read. Pairs without an article stay. */
+export async function onReadablePages(pairs) {
+  const pages = [...new Set(pairs.map((p) => p.link?.pageId).filter(Boolean))];
+  const ok = new Set();
+  for (const id of pages) if (await canReadPage(id)) ok.add(id);
+  return pairs.filter((p) => !p.link?.pageId || ok.has(p.link.pageId));
+}

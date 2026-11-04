@@ -6,7 +6,7 @@
 import { route, kvs } from './forge.js';
 import { call } from './http.js';
 import { forProject } from './store.js';
-import { diffArticle, computeImpact, suggestAnswer } from '../core/index.js';
+import { diffArticle, computeImpact, suggestAnswer, applyEdits } from '../core/index.js';
 import { stripMarkup } from '../core/text.js';
 
 // Jira and Confluence get separate installations of the app, and each installation has its own
@@ -96,16 +96,14 @@ export async function checkPage(projectKey, pageId) {
 
   const current = await currentPage(id, cfg?.spaceId);
   if (!current) return { record: null, reason: 'page_not_found' };
-  if (current.version === baseline.version) return { record: null, reason: 'no_change' };
-  const diff = diffArticle(baseline.text, current.text);
-  const impacts = new Set((await db.get('impacts')) || []);
+  const previous = await db.get(`impact:${id}`);
+  const diff = current.version === baseline.version ? { changed: false } : diffArticle(baseline.text, current.text);
 
   if (!diff.changed) {
-    if (impacts.has(id)) {
+    // Back to the baseline, or accepted while this check was running: no open edit for this page.
+    if (previous) {
       await db.del(`impact:${id}`);
-      impacts.delete(id);
-      await db.set('impacts', [...impacts]);
-      await publishByline(id, projectKey, { total: pairs.length, outdated: 0 });
+      await publishByline(id, projectKey, { total: pairs.length, outdated: 0 }).catch(() => null);
     }
     return { record: null, reason: 'no_change' };
   }
@@ -129,18 +127,23 @@ export async function checkPage(projectKey, pageId) {
       return { ...a, question: p.question, expected: p.expected, suggestion: fix.suggestion, needsReview: fix.needsReview };
     }),
   };
-  const previous = await db.get(`impact:${id}`);
+  // The byline is published first and remembered on the record, so a failed write is retried next time.
+  const bylineOk = previous?.bylineFor === `${record.toVersion}:${record.counts.outdated}`;
+  if (!bylineOk) {
+    const ok = await publishByline(id, projectKey, { total: pairs.length, outdated: record.counts.outdated }).then(() => true).catch(() => false);
+    if (ok) record.bylineFor = `${record.toVersion}:${record.counts.outdated}`;
+  } else record.bylineFor = previous.bylineFor;
   await db.set(`impact:${id}`, record);
-  impacts.add(id);
-  await db.set('impacts', [...impacts]);
-  if (!previous || previous.toVersion !== record.toVersion) await publishByline(id, projectKey, { total: pairs.length, outdated: record.counts.outdated });
   return { record, reason: 'changed' };
 }
 
 export async function listImpacts(db) {
-  const ids = (await db.get('impacts')) || [];
-  const records = await Promise.all(ids.map((id) => db.get(`impact:${id}`)));
-  return records.filter(Boolean).sort((a, b) => b.checkedAt.localeCompare(a.checkedAt));
+  const records = await db.valuesByPrefix('impact:');
+  return records.filter((r) => r?.pageId).sort((a, b) => b.checkedAt.localeCompare(a.checkedAt));
+}
+
+export async function clearImpacts(db) {
+  for (const r of await listImpacts(db)) await db.del(`impact:${r.pageId}`);
 }
 
 /**
@@ -152,19 +155,30 @@ export async function acceptEdit(projectKey, pageId, { applySuggestions }) {
   const id = String(pageId);
   const record = await db.get(`impact:${id}`);
   if (!record) return null;
-  if (applySuggestions) {
-    const fixes = new Map(record.affected.filter((a) => a.suggestion).map((a) => [a.id, a.suggestion]));
-    const selected = await db.getList('pairs:selected');
-    await db.setList('pairs:selected', selected.map((p) => (fixes.has(p.id) ? { ...p, expected: fixes.get(p.id), updatedFrom: p.expected } : p)));
-  }
   const cfg = await db.get('config');
   const current = await currentPage(id, cfg?.spaceId);
+  // Someone edited the article again after this check: accepting now would hide the newer change.
+  if (current && current.version !== record.toVersion) {
+    await checkPage(projectKey, id);
+    return { accepted: null, changedAgain: true };
+  }
+  let applied = 0;
+  if (applySuggestions) {
+    // Applied suggestions are stored as edits, so a rescan keeps them instead of bringing back the old text.
+    const at = new Date().toISOString();
+    const fixes = Object.fromEntries(record.affected.filter((a) => a.suggestion).map((a) => [a.id, { expected: a.suggestion, at, source: 'suggestion' }]));
+    applied = Object.keys(fixes).length;
+    await db.set('edits', { ...((await db.get('edits')) || {}), ...fixes });
+    for (const k of ['pairs:selected', 'pairs:reserve', 'pairs:excluded']) {
+      const list = await db.getList(k);
+      if (list.some((p) => fixes[p.id])) await db.setList(k, applyEdits(list, fixes));
+    }
+  }
   if (current) await db.set(`snap:${id}`, current);
   await db.del(`impact:${id}`);
-  await db.set('impacts', ((await db.get('impacts')) || []).filter((x) => x !== id));
   const total = (await db.getList('pairs:selected')).filter((p) => p.link?.pageId === id).length;
-  await publishByline(id, projectKey, { total, outdated: 0 });
-  return { accepted: id, applied: applySuggestions ? record.affected.filter((a) => a.suggestion).length : 0 };
+  await publishByline(id, projectKey, { total, outdated: 0 }).catch(() => null);
+  return { accepted: id, applied };
 }
 
 /** Checks every page the project relies on. Cheap when nothing changed: one version read per page. */
@@ -190,7 +204,11 @@ export async function checkProject(projectKey) {
 /** Scheduled every five minutes in the Jira installation. */
 export async function scheduledCheck() {
   for (const projectKey of await registeredProjects()) {
-    const results = await checkProject(projectKey);
+    // One failing project must not stop the checks of the others.
+    const results = await checkProject(projectKey).catch((e) => {
+      console.error(`scheduled check ${projectKey} failed: ${e.message}`);
+      return [];
+    });
     const changed = results.filter((r) => r.reason === 'changed');
     if (changed.length) console.log(`scheduled check ${projectKey}: ${changed.map((r) => `${r.pageId} ${r.record.counts.affected}/${r.record.counts.outdated}`).join(', ')}`);
   }

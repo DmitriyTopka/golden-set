@@ -1,4 +1,4 @@
-import { buildCandidate, isReopened, cleanQuestion, baseScore, REJECT } from '../core/pairs.js';
+import { buildCandidate, isReopened, cleanQuestion, baseScore, isAgentAuthor, REJECT, MAX_TEXT } from '../core/pairs.js';
 
 const reporter = { id: 'c1', name: 'Priya Nair' };
 const agent = { id: 'a1', name: 'Sam Rivera' };
@@ -88,5 +88,32 @@ describe('helpers', () => {
   test('baseScore rewards CSAT and calm endings', () => {
     expect(baseScore({ csat: 5, thanked: true, noFollowUp: false })).toBe(3);
     expect(baseScore({ csat: null, thanked: false, noFollowUp: true })).toBe(1);
+  });
+});
+
+describe('who counts as the agent (review finding 12)', () => {
+  test('a customer participant is not an agent, an Atlassian account is', () => {
+    expect(isAgentAuthor({ id: 'c2', name: 'Other customer', accountType: 'customer' }, 'c1')).toBe(false);
+    expect(isAgentAuthor({ id: 'a1', name: 'Sam from support', accountType: 'atlassian' }, 'c1')).toBe(true);
+    expect(isAgentAuthor({ id: 'b1', name: 'Some bot', accountType: 'app' }, 'c1')).toBe(false);
+  });
+});
+
+describe('long text is capped (review finding 10)', () => {
+  test('a pasted log does not grow the stored pair without limit', () => {
+    const log = 'ERROR line. '.repeat(1000);
+    const res = buildCandidate({
+      key: 'NS-1',
+      reporter: { id: 'c1', name: 'Customer' },
+      summary: 'App crashes',
+      description: log,
+      statusHistory: [],
+      resolvedAt: '2026-11-01T10:00:00Z',
+      comments: [{ id: '1', author: { id: 'a1', name: 'Agent', accountType: 'atlassian' }, public: true, body: `Please reinstall the app from the store and restart the phone. ${log}`, created: '2026-11-01T09:00:00Z' }],
+    });
+    expect(res.ok).toBe(true);
+    expect(res.pair.question.length).toBeLessThanOrEqual(MAX_TEXT);
+    expect(res.pair.expected.length).toBeLessThanOrEqual(MAX_TEXT);
+    expect(res.pair.answerOriginal.length).toBeLessThanOrEqual(MAX_TEXT);
   });
 });

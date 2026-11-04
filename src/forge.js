@@ -12,3 +12,4 @@ export const api = unwrap(apiModule);
 export const route = named(apiModule, 'route');
 export const Resolver = unwrap(resolverModule);
 export const kvs = named(kvsModule, 'kvs');
+export const WhereConditions = named(kvsModule, 'WhereConditions');

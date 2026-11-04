@@ -2,7 +2,8 @@
 // Runs as the clicking user (an agent), in small steps so each resolver call stays under 25 s.
 //
 // What a live site can and cannot reproduce from seed/data.mjs:
-// - articles, requests raised on behalf of existing customers, public agent replies, resolve/reopen: yes;
+// - articles, requests raised on behalf of demo customers (example.com) or the project's own customers,
+//   public agent replies, resolve/reopen: yes;
 // - customer-authored follow-ups and CSAT need the customer's own login: no. The complaint and
 //   low-CSAT examples are therefore seeded as reopened requests, which is how they usually end anyway.
 import { route } from './forge.js';
@@ -43,42 +44,66 @@ async function requestTypeId(serviceDeskId) {
   return String(preferred.id);
 }
 
-/** Picks up to 5 customers that already exist on the site and adds them to our project. No new accounts. */
-async function pickCustomers(serviceDeskId) {
-  const own = await call('user', 'jira', route`/rest/servicedeskapi/servicedesk/${serviceDeskId}/customer?limit=50`, {
+const DEMO_NAMES = ['Northwind demo customer 1', 'Northwind demo customer 2', 'Northwind demo customer 3'];
+const isDemo = (c) => DEMO_NAMES.includes(c.displayName);
+
+async function projectCustomers(serviceDeskId) {
+  const res = await call('user', 'jira', route`/rest/servicedeskapi/servicedesk/${serviceDeskId}/customer?limit=50`, {
     headers: { 'X-ExperimentalApi': 'opt-in' },
   });
-  let customers = (own?.values || []).filter((c) => c.active !== false);
-  if (customers.length < 5) {
-    const desks = await call('user', 'jira', route`/rest/servicedeskapi/servicedesk?limit=50`);
-    for (const d of desks?.values || []) {
-      if (String(d.id) === String(serviceDeskId) || customers.length >= 5) continue;
-      const other = await call('user', 'jira', route`/rest/servicedeskapi/servicedesk/${d.id}/customer?limit=50`, {
-        headers: { 'X-ExperimentalApi': 'opt-in' },
-      });
-      for (const c of other?.values || []) if (c.active !== false && !customers.some((x) => x.accountId === c.accountId)) customers.push(c);
-    }
-    customers = customers.slice(0, 5);
-    if (customers.length === 0) throw new Error('No customers found on this site to raise demo requests for.');
+  return (res?.values || []).filter((c) => c.active !== false);
+}
+
+/**
+ * Who the demo requests are raised for. First choice: three demo customers on example.com addresses,
+ * a reserved domain, so JSM notifications go nowhere. Creating customers needs Jira admin rights; without
+ * them the project's own customers are used. Customers of other projects are never touched.
+ */
+async function demoCustomers(serviceDeskId) {
+  let own = await projectCustomers(serviceDeskId);
+  const missing = DEMO_NAMES.filter((n) => !own.some((c) => c.displayName === n));
+  const added = [];
+  for (const name of missing) {
+    const n = DEMO_NAMES.indexOf(name) + 1;
+    const created = await call('user', 'jira', route`/rest/servicedeskapi/customer`, {
+      method: 'POST',
+      body: { email: `northwind.demo.${n}@example.com`, displayName: name },
+    }).catch(() => null);
+    if (created?.accountId) added.push(created.accountId);
+  }
+  if (added.length) {
     await call('user', 'jira', route`/rest/servicedeskapi/servicedesk/${serviceDeskId}/customer`, {
       method: 'POST',
       headers: { 'X-ExperimentalApi': 'opt-in' },
-      body: { accountIds: customers.map((c) => c.accountId) },
+      body: { accountIds: added },
     });
+    own = await projectCustomers(serviceDeskId);
   }
-  return customers.slice(0, 5).map((c) => ({ id: c.accountId, name: c.displayName }));
+  const demo = own.filter(isDemo);
+  const pick = demo.length ? demo : own;
+  if (!pick.length) {
+    throw new Error('Demo data needs at least one customer in this service project. Ask a Jira admin to load it (they can create demo customers), or add a test customer first.');
+  }
+  return pick.slice(0, 5).map((c) => ({ id: c.accountId, name: c.displayName, demo: isDemo(c) }));
 }
 
-async function createPages(spaceId) {
-  const map = {};
+/** Creates the demo articles, or reuses pages with the same titles. Progress is saved after each page. */
+async function createPages(st, db) {
+  st.pages = st.pages || {};
   for (const a of ARTICLES) {
-    const page = await call('user', 'confluence', route`/wiki/api/v2/pages`, {
-      method: 'POST',
-      body: { spaceId, status: 'current', title: a.title, body: { representation: 'storage', value: a.body.map((s) => `<p>${s}</p>`).join('') } },
-    });
-    map[a.pageId] = String(page.id);
+    if (st.pages[a.pageId]) continue;
+    const found = await call('user', 'confluence', route`/wiki/api/v2/spaces/${st.spaceId}/pages?title=${a.title}&status=current&limit=1`);
+    const existing = found?.results?.[0];
+    const page =
+      existing ||
+      (await call('user', 'confluence', route`/wiki/api/v2/pages`, {
+        method: 'POST',
+        body: { spaceId: st.spaceId, status: 'current', title: a.title, body: { representation: 'storage', value: a.body.map((x) => `<p>${x}</p>`).join('') } },
+      }));
+    st.pages[a.pageId] = String(page.id);
+    await db.set(STATE, st);
   }
-  return map;
+  return st.pages;
 }
 
 // Workflows differ: some go straight to Done, others need "In progress" first. Walk up to 4 steps,
@@ -177,10 +202,10 @@ export async function seedNext(db, config, ctx) {
   }
   try {
     if (st.phase === 'pages') {
-      st.pages = await createPages(st.spaceId);
+      await createPages(st, db);
       st.phase = 'customers';
     } else if (st.phase === 'customers') {
-      st.customers = await pickCustomers(st.serviceDeskId);
+      st.customers = await demoCustomers(st.serviceDeskId);
       st.requestTypeId = await requestTypeId(st.serviceDeskId);
       st.phase = 'requests';
     } else if (st.phase === 'requests') {

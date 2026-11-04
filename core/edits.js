@@ -25,7 +25,7 @@ export function applyEdits(pairs, edits) {
   return pairs.map((p) => {
     const e = edits[p.id];
     if (!e) return p;
-    return { ...p, expected: e.expected, edited: { from: p.edited?.from ?? p.expected, at: e.at } };
+    return { ...p, expected: e.expected, edited: { from: p.edited?.from ?? p.expected, at: e.at, ...(e.source ? { source: e.source } : {}) } };
   });
 }
 
