@@ -117,3 +117,8 @@ app:
     memoryMB: 256
     architecture: arm64
   id: ari:cloud:ecosystem::app/c4b582c2-566a-4180-9837-2917cd0f3d87
+  compatibility:
+    jira:
+      required: true
+    confluence:
+      required: false
