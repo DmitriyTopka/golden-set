@@ -495,10 +495,15 @@ function QueueApp() {
           )}
           {!s && overview.seed?.phase === 'done' && <p className="hint">Demo data is ready. Next: <b>Scan resolved requests</b>.</p>}
           {(scan.error || seed.error) && <p className="error">{scan.error || seed.error}</p>}
+          {s && s.requests > 0 && s.selected === 0 && (
+            <p className="error small">
+              No request made it into the golden set. Usually the answers are not public agent replies (for example, the agent is also the customer who raised the request). See "Why requests were left out" below.
+            </p>
+          )}
           {s && (
             <ul className="stats">
               <li><b>{s.requests}</b> resolved requests read</li>
-              <li><b>{s.rejected}</b> rejected (reopened, complaint, low CSAT)</li>
+              <li><b>{s.rejected}</b> rejected (reasons below)</li>
               <li><b>{s.duplicates}</b> duplicates folded</li>
               <li><b>{s.selected}</b> golden pairs across <b>{s.articles}</b> articles</li>
             </ul>

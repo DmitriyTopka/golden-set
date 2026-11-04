@@ -15,7 +15,7 @@ Time needed: about 3 minutes to install, about 10 minutes to try everything with
 
 1. Open the install link: `INSTALL_LINK` (filled in at submission).
 2. Pick your site and install Golden Set into **Jira**.
-3. Approve the connection to **Confluence** on the same site when asked. It is one installation: Jira and Confluence share it.
+3. Connect **Confluence** to the same installation: in admin.atlassian.com open your site, **Connected apps > golden-set-app > Connections**, and press **Connect** next to Confluence. Jira and Confluence then share one installation, and Rovo shows one Golden Set agent.
 
 If the page says "Installation failed" in Jira, wait a minute and try again. We saw this once on a fresh site; the second attempt worked.
 
@@ -23,8 +23,8 @@ If the page says "Installation failed" in Jira, wait a minute and try again. We 
 
 1. In your service project, open **Queues** in the project sidebar and pick **Golden Set** at the bottom of the queue list.
 2. **1. Which knowledge base do agents answer from?** Pick your test Confluence space and press **Save**.
-3. **2. Build the golden set.** Press **Load demo data (Northwind Gear)**. It takes 2 to 3 minutes. Then press **Scan resolved requests**.
-   You should see: 80 resolved requests read, 15 rejected (reopened, complaint, low CSAT), 5 duplicates folded, 50 golden pairs across 7 articles.
+3. **2. Build the golden set.** Press **Load demo data (Northwind Gear)**. It takes about 6 minutes; you can watch the counter. Then press **Scan resolved requests**.
+   You should see: 80 resolved requests read, 15 rejected (reasons listed below the pairs), 5 duplicates folded, 50 golden pairs across 7 articles.
 4. Look at **4. Golden pairs**. Each answer comes from a resolved request. Golden Set replaces personal data with [email], [phone] and so on, and shows the article each pair relies on. Try the **Help article** filter, **Not golden**, and **Edit** on an answer.
 5. Open the Confluence page **Returns policy** in your space. Change "within 30 days of delivery" to "within 14 days of delivery" and publish.
 6. Back in Golden Set, reload the page (or pick the article and press **Check now**). Section **3. Article changes** says that 12 golden answers depend on this page and 8 are likely outdated, shows the change "30 days -> 14 days" and a suggested new answer for each.

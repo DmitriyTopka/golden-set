@@ -60,31 +60,35 @@ async function projectCustomers(serviceDeskId) {
  * them the project's own customers are used. Customers of other projects are never touched.
  */
 async function demoCustomers(serviceDeskId) {
-  let own = await projectCustomers(serviceDeskId);
-  const missing = DEMO_NAMES.filter((n) => !own.some((c) => c.displayName === n));
+  // The person loading the demo answers every request as the agent, so they can never be the customer:
+  // a request answered by its own reporter has no agent reply and would be rejected.
+  const me = (await call('user', 'jira', route`/rest/api/3/myself`))?.accountId;
+  const own = (await projectCustomers(serviceDeskId)).filter((c) => c.accountId !== me);
+  const demo = own.filter(isDemo).map((c) => ({ id: c.accountId, name: c.displayName, demo: true }));
   const added = [];
-  for (const name of missing) {
+  for (const name of DEMO_NAMES.filter((n) => !demo.some((c) => c.name === n))) {
     const n = DEMO_NAMES.indexOf(name) + 1;
     const created = await call('user', 'jira', route`/rest/servicedeskapi/customer`, {
       method: 'POST',
       body: { email: `northwind.demo.${n}@example.com`, displayName: name },
     }).catch(() => null);
-    if (created?.accountId) added.push(created.accountId);
+    if (created?.accountId) added.push({ id: created.accountId, name, demo: true });
   }
   if (added.length) {
     await call('user', 'jira', route`/rest/servicedeskapi/servicedesk/${serviceDeskId}/customer`, {
       method: 'POST',
       headers: { 'X-ExperimentalApi': 'opt-in' },
-      body: { accountIds: added },
+      body: { accountIds: added.map((c) => c.id) },
     });
-    own = await projectCustomers(serviceDeskId);
   }
-  const demo = own.filter(isDemo);
-  const pick = demo.length ? demo : own;
-  if (!pick.length) {
-    throw new Error('Demo data needs at least one customer in this service project. Ask a Jira admin to load it (they can create demo customers), or add a test customer first.');
+  // Use what we just created directly: the customer list can lag a few seconds behind.
+  const pick = [...demo, ...added];
+  if (pick.length) return pick.slice(0, 5);
+  const others = own.map((c) => ({ id: c.accountId, name: c.displayName, demo: false }));
+  if (!others.length) {
+    throw new Error('Demo data needs a customer other than you in this service project. Ask a Jira admin to load it (they can create demo customers), or add a test customer first.');
   }
-  return pick.slice(0, 5).map((c) => ({ id: c.accountId, name: c.displayName, demo: isDemo(c) }));
+  return others.slice(0, 5);
 }
 
 /** Creates the demo articles, or reuses pages with the same titles. Progress is saved after each page. */
