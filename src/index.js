@@ -50,7 +50,16 @@ const configOf = async (db) => (await db.get('config')) || null;
 resolver.define('getOverview', async ({ context }) => {
   const { projectKey, perms, db } = await guard(context, 'browse');
   const [cfg, seed, scan, summary] = await Promise.all([configOf(db), seedState(db), db.get('scan:state'), db.get('result:summary')]);
-  return { projectKey, isAdmin: perms.admin, config: cfg, seed, scan: scan || { phase: 'idle' }, summary: summary || null };
+  // Non-admins only need to know whether a set exists; seed progress and request keys stay with admins.
+  const brief = (x) => (x ? { phase: x.phase, total: x.total, done: x.done } : { phase: 'idle' });
+  return {
+    projectKey,
+    isAdmin: perms.admin,
+    config: cfg && (perms.admin ? cfg : { spaceName: cfg.spaceName, projectName: cfg.projectName }),
+    seed: perms.admin ? seed : brief(seed),
+    scan: perms.admin ? scan || { phase: 'idle' } : brief(scan),
+    summary: summary || null,
+  };
 });
 
 resolver.define('listSources', async ({ context }) => {
@@ -68,6 +77,11 @@ resolver.define('saveConfig', async ({ payload, context }) => {
   const space = spaces?.results?.[0];
   if (!space) throw new Error('Confluence space not found or not visible to you.');
   const cfg = { serviceDeskId: desk.id, projectKey, projectName: desk.name, spaceId: String(space.id), spaceKey: space.key, spaceName: space.name };
+  const previous = await configOf(db);
+  if (previous && previous.spaceId !== cfg.spaceId) {
+    // Pairs quote articles of the old space; drop them so readers are never checked against the wrong space.
+    await Promise.all([db.clearList('pairs:selected'), db.clearList('pairs:reserve'), db.del('pairs:rejected'), db.del('pairs:duplicates'), db.del('result:summary'), db.del('articles:versions')]);
+  }
   await db.set('config', cfg);
   return cfg;
 });
@@ -132,18 +146,37 @@ resolver.define('scanFinish', async ({ context }) => {
   await db.set('articles:versions', Object.fromEntries(articles.map((a) => [a.pageId, a.version])));
   // Raw requests carry unredacted customer text; keep only the redacted pairs once selection is done.
   await db.clearList('raw');
-  const summary = { ...result.stats, articles: articles.length, scannedAt: new Date().toISOString() };
+  const summary = { ...result.stats, articles: articles.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
   await db.set('result:summary', summary);
   await db.set('scan:state', { phase: 'done', total: st?.keys?.length || requests.length, done: requests.length });
   return summary;
 });
 
-/** Readers also need access to the knowledge base space, because pairs quote its articles. */
+/**
+ * Readers need access to the space the pairs were built from, and only see pairs whose request they
+ * could open themselves (issue security levels can hide single requests inside a browsable project).
+ */
 async function readerDb(context) {
   const { db } = await guard(context, 'browse');
+  const summary = await db.get('result:summary');
   const cfg = await configOf(db);
-  if (cfg && !(await canSeeSpace(cfg.spaceId))) throw new Error(`You do not have access to the ${cfg.spaceName} space.`);
+  const spaceId = summary?.spaceId || cfg?.spaceId;
+  if (spaceId && !(await canSeeSpace(spaceId))) throw new Error('You do not have access to the knowledge base space of this golden set.');
   return db;
+}
+
+/** Keys of the given requests that the calling user can open. */
+async function visibleKeys(keys) {
+  const visible = new Set();
+  for (let i = 0; i < keys.length; i += 100) {
+    const chunk = keys.slice(i, i + 100);
+    const res = await call('user', 'jira', route`/rest/api/3/search/jql`, {
+      method: 'POST',
+      body: { jql: `key in (${chunk.join(',')})`, fields: ['summary'], maxResults: 100 },
+    });
+    for (const issue of res?.issues || []) visible.add(issue.key);
+  }
+  return visible;
 }
 
 resolver.define('getPairs', async ({ context }) => {
@@ -155,7 +188,16 @@ resolver.define('getPairs', async ({ context }) => {
     db.get('pairs:duplicates'),
     db.get('result:summary'),
   ]);
-  return { selected, reserve, rejected: rejected || [], duplicates: duplicates || [], summary };
+  const all = [...selected, ...reserve, ...(rejected || []), ...(duplicates || [])].map((x) => x.id);
+  const visible = await visibleKeys([...new Set(all)]);
+  const seen = (x) => visible.has(x.id);
+  return {
+    selected: selected.filter(seen),
+    reserve: reserve.filter(seen),
+    rejected: (rejected || []).filter(seen),
+    duplicates: (duplicates || []).filter(seen),
+    summary,
+  };
 });
 
 resolver.define('markNotGolden', async ({ payload, context }) => {
@@ -169,7 +211,9 @@ resolver.define('markNotGolden', async ({ payload, context }) => {
 
 resolver.define('exportCsv', async ({ payload, context }) => {
   const db = await readerDb(context);
-  const selected = await db.getList('pairs:selected');
+  const all = await db.getList('pairs:selected');
+  const visible = await visibleKeys(all.map((p) => p.id));
+  const selected = all.filter((p) => visible.has(p.id));
   const ids = payload?.ids ? new Set(payload.ids) : null;
   const rows = ids ? selected.filter((p) => ids.has(p.id)) : selected;
   return toCsvChunks(rows);
