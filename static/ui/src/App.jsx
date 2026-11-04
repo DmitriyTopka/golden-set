@@ -8,6 +8,7 @@ const REASONS = {
   customer_followed_up: 'Customer wrote back after the answer',
   low_csat: 'Low satisfaction rating',
   empty_question: 'Empty question',
+  answer_has_no_content: 'The answer has no content to test (only a link or a word)',
   marked_not_golden: 'Marked "not golden" by an admin',
 };
 
@@ -96,38 +97,54 @@ function useStepper(startFn, stepFn, isDone) {
   return { state, running, error, run };
 }
 
-function PairTable({ pairs, onToggle }) {
-  if (!pairs.length) return <p className="muted">No golden pairs yet. Run a scan.</p>;
+function PairTable({ pairs, onToggle, actionLabel = 'Not golden' }) {
+  const [article, setArticle] = useState('');
+  const titles = [...new Set(pairs.map((p) => p.articleTitle).filter(Boolean))].sort();
+  const shown = article ? pairs.filter((p) => p.articleTitle === article) : pairs;
+  if (!pairs.length) return <p className="muted">Nothing here yet.</p>;
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Request</th>
-          <th>Customer question</th>
-          <th>Expected answer</th>
-          <th>Help article</th>
-          <th>Score</th>
-          <th />
-        </tr>
-      </thead>
-      <tbody>
-        {pairs.map((p) => (
-          <tr key={p.id}>
-            <td className="mono">{p.id}</td>
-            <td>{p.question}</td>
-            <td>{p.expected}</td>
-            <td>
-              {p.articleTitle || '-'}
-              {p.link && <span className={`tag ${p.link.method}`}>{p.link.method === 'link' ? 'linked' : 'by fact'}</span>}
-            </td>
-            <td>{p.score}</td>
-            <td>
-              {onToggle && <button className="subtle" onClick={() => onToggle(p.id)}>Not golden</button>}
-            </td>
+    <>
+      {titles.length > 1 && (
+        <div className="row filter">
+          <label>
+            Help article
+            <select value={article} onChange={(e) => setArticle(e.target.value)}>
+              <option value="">All articles ({pairs.length})</option>
+              {titles.map((t) => (
+                <option key={t} value={t}>{`${t} (${pairs.filter((p) => p.articleTitle === t).length})`}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+      <table>
+        <thead>
+          <tr>
+            <th>Request</th>
+            <th>Customer question</th>
+            <th>Expected answer</th>
+            <th>Help article</th>
+            <th>Score</th>
+            <th />
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {shown.map((p) => (
+            <tr key={p.id}>
+              <td className="mono">{p.id}</td>
+              <td>{p.question}</td>
+              <td>{p.expected}</td>
+              <td>
+                {p.articleTitle || '-'}
+                {p.link && <span className={`tag ${p.link.method}`}>{p.link.method === 'link' ? 'linked' : 'by fact'}</span>}
+              </td>
+              <td>{p.score}</td>
+              <td>{onToggle && <button className="subtle" onClick={() => onToggle(p.id)}>{actionLabel}</button>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
 
@@ -167,9 +184,17 @@ export default function App() {
     const files = await invoke('exportCsv', {});
     files.forEach((csv, i) => download(files.length > 1 ? `golden-set-${i + 1}.csv` : 'golden-set.csv', csv));
   };
-  const toggle = async (id) => {
-    await invoke('markNotGolden', { id, value: true });
-    await refresh();
+  const [busy, setBusy] = useState(false);
+  const mark = (value) => async (id) => {
+    setBusy(true);
+    try {
+      await invoke('markNotGolden', { id, value });
+      await refresh();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (error) return <p className="error">{error}</p>;
@@ -224,7 +249,14 @@ export default function App() {
             <h2>3. Golden pairs</h2>
             <button onClick={exportAll} disabled={!pairs.selected.length}>Download CSV for Rovo Evaluations</button>
           </div>
-          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin ? toggle : null} />
+          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin && !busy ? mark(true) : null} />
+        </section>
+      )}
+
+      {s && pairs.excluded?.length > 0 && (
+        <section className="card">
+          <h2>Marked not golden by an admin ({pairs.excluded.length})</h2>
+          <PairTable pairs={pairs.excluded} onToggle={overview.isAdmin && !busy ? mark(false) : null} actionLabel="Restore" />
         </section>
       )}
 

@@ -11,7 +11,7 @@ import { forProject } from './store.js';
 import { listServiceDesks, statusCategories, closedRequestKeys, readRequests } from './jsm.js';
 import { readArticles } from './confluence.js';
 import { seedNext, seedState, resetSeed } from './seed.js';
-import { selectGoldenSet, toCsvChunks } from '../core/index.js';
+import { selectGoldenSet, reselect, toCsvChunks } from '../core/index.js';
 
 const resolver = new Resolver();
 const SCAN_BATCH = 10;
@@ -135,18 +135,21 @@ resolver.define('scanFinish', async ({ context }) => {
   const cfg = await configOf(db);
   const st = await db.get('scan:state');
   const [requests, articles, excludedList] = await Promise.all([db.getList('raw'), readArticles(cfg.spaceId), db.get('excluded')]);
-  const result = selectGoldenSet(requests, articles, { excluded: new Set(excludedList || []) });
+  const result = selectGoldenSet(requests, articles);
   const titles = Object.fromEntries(articles.map((a) => [a.pageId, a.title]));
   const withTitles = (p) => ({ ...p, articleTitle: p.link ? titles[p.link.pageId] : null });
+  // "Not golden" marks survive a rescan: excluded pairs are parked, not lost, so they can be restored.
+  const next = reselect([...result.selected, ...result.reserve].map(withTitles), new Set(excludedList || []));
 
-  await db.setList('pairs:selected', result.selected.map(withTitles));
-  await db.setList('pairs:reserve', result.reserve.map(withTitles));
+  await db.setList('pairs:selected', next.selected);
+  await db.setList('pairs:reserve', next.reserve);
+  await db.setList('pairs:excluded', next.excluded);
   await db.set('pairs:rejected', result.rejected);
   await db.set('pairs:duplicates', result.duplicates);
   await db.set('articles:versions', Object.fromEntries(articles.map((a) => [a.pageId, a.version])));
   // Raw requests carry unredacted customer text; keep only the redacted pairs once selection is done.
   await db.clearList('raw');
-  const summary = { ...result.stats, articles: articles.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
+  const summary = { ...result.stats, selected: next.selected.length, excludedByAdmin: next.excluded.length, articles: articles.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
   await db.set('result:summary', summary);
   await db.set('scan:state', { phase: 'done', total: st?.keys?.length || requests.length, done: requests.length });
   return summary;
@@ -181,19 +184,21 @@ async function visibleKeys(keys) {
 
 resolver.define('getPairs', async ({ context }) => {
   const db = await readerDb(context);
-  const [selected, reserve, rejected, duplicates, summary] = await Promise.all([
+  const [selected, reserve, rejected, duplicates, summary, excluded] = await Promise.all([
     db.getList('pairs:selected'),
     db.getList('pairs:reserve'),
     db.get('pairs:rejected'),
     db.get('pairs:duplicates'),
     db.get('result:summary'),
+    db.getList('pairs:excluded'),
   ]);
-  const all = [...selected, ...reserve, ...(rejected || []), ...(duplicates || [])].map((x) => x.id).concat((duplicates || []).map((d) => d.duplicateOf));
+  const all = [...selected, ...reserve, ...excluded, ...(rejected || []), ...(duplicates || [])].map((x) => x.id).concat((duplicates || []).map((d) => d.duplicateOf));
   const visible = await visibleKeys([...new Set(all)]);
   const seen = (x) => visible.has(x.id);
   return {
     selected: selected.filter(seen),
     reserve: reserve.filter(seen),
+    excluded: excluded.filter(seen),
     rejected: (rejected || []).filter(seen),
     // A duplicate names another request, so both must be visible to the caller.
     duplicates: (duplicates || []).filter((d) => visible.has(d.id) && visible.has(d.duplicateOf)),
@@ -201,13 +206,22 @@ resolver.define('getPairs', async ({ context }) => {
   };
 });
 
+// Marks or restores a pair and recomputes the set at once from the stored scores; no new scan needed.
 resolver.define('markNotGolden', async ({ payload, context }) => {
   const { db } = await guard(context, 'admin');
   const excluded = new Set((await db.get('excluded')) || []);
   if (payload.value) excluded.add(payload.id);
   else excluded.delete(payload.id);
+  const [selected, reserve, parked] = await Promise.all([db.getList('pairs:selected'), db.getList('pairs:reserve'), db.getList('pairs:excluded')]);
+  const pool = [...selected, ...reserve, ...parked];
+  const next = reselect(pool, excluded);
+  await db.setList('pairs:selected', next.selected);
+  await db.setList('pairs:reserve', next.reserve);
+  await db.setList('pairs:excluded', next.excluded);
   await db.set('excluded', [...excluded]);
-  return [...excluded];
+  const summary = await db.get('result:summary');
+  if (summary) await db.set('result:summary', { ...summary, selected: next.selected.length, excludedByAdmin: next.excluded.length });
+  return { selected: next.selected.length, excluded: next.excluded.length };
 });
 
 resolver.define('exportCsv', async ({ payload, context }) => {

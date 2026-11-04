@@ -2,7 +2,7 @@
 // The fixture labels every request, so we know exactly what should come out.
 
 import { readFileSync } from 'node:fs';
-import { selectGoldenSet, balancedTop, dedupe, pairsByPage } from '../core/select.js';
+import { selectGoldenSet, balancedTop, dedupe, pairsByPage, reselect } from '../core/select.js';
 import { indexArticles, linkPair } from '../core/link.js';
 import { buildCandidate } from '../core/pairs.js';
 import { toCsv } from '../core/csv.js';
@@ -72,6 +72,27 @@ describe('selectGoldenSet on Northwind', () => {
 
   test('limit is honoured', () => {
     expect(selectGoldenSet(seed.requests, seed.articles, { limit: 10 }).selected).toHaveLength(10);
+  });
+});
+
+describe('reselect after "not golden"', () => {
+  test('the best reserve pair takes the freed slot, and restoring brings the pair back', () => {
+    const pool = [...result.selected, ...result.reserve];
+    const victim = result.selected[0].id;
+    const once = reselect(pool, new Set([victim]));
+    expect(once.selected).toHaveLength(50);
+    expect(once.selected.map((p) => p.id)).not.toContain(victim);
+    expect(once.excluded.map((p) => p.id)).toEqual([victim]);
+    const promoted = once.selected.find((p) => !result.selected.some((q) => q.id === p.id));
+    expect(label.get(promoted.id)).toBe('nolink_fact');
+    const back = reselect(pool, new Set());
+    expect(back.selected.map((p) => p.id).sort()).toEqual(result.selected.map((p) => p.id).sort());
+  });
+
+  test('unlinked pairs never enter the set', () => {
+    const pool = [...result.selected, ...result.reserve];
+    const all = new Set(result.selected.map((p) => p.id));
+    expect(reselect(pool, all).selected.every((p) => p.link)).toBe(true);
   });
 });
 

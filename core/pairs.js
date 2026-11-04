@@ -42,6 +42,7 @@ export const REJECT = {
   COMPLAINT: 'customer_followed_up',
   LOW_CSAT: 'low_csat',
   EMPTY_QUESTION: 'empty_question',
+  EMPTY_ANSWER: 'answer_has_no_content',
 };
 
 export function isReopened(statusHistory = []) {
@@ -92,6 +93,8 @@ export function buildCandidate(request) {
   const refs = findPageRefs(answer.body);
   const answerClean = redactPII(stripLinks(answerText), { names });
   const expected = normalizeAnswer(answerClean);
+  // "See <link>" or "Done." teaches an agent nothing and gives Evaluations nothing to compare.
+  if (expected.replace(/[^\p{L}\p{N}]/gu, '').length < 12) return { ok: false, key: request.key, reason: REJECT.EMPTY_ANSWER };
 
   return {
     ok: true,

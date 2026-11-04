@@ -119,3 +119,20 @@ export function pairsByPage(pairs) {
   }
   return m;
 }
+
+/**
+ * Recomputes the set from already scored pairs, without reading Jira again.
+ * Used when an admin marks a pair "not golden" or restores it: the best reserve pair moves up.
+ * @param {object[]} pool every scored pair from the last scan (selected and reserve together)
+ * @param {Set<string>} excluded pair ids marked "not golden"
+ */
+export function reselect(pool, excluded, limit = DEFAULT_LIMIT) {
+  const active = pool.filter((p) => !excluded.has(p.id));
+  const selected = balancedTop(active.filter((p) => p.link), limit);
+  const chosen = new Set(selected.map((p) => p.id));
+  return {
+    selected,
+    reserve: active.filter((p) => !chosen.has(p.id)),
+    excluded: pool.filter((p) => excluded.has(p.id)),
+  };
+}

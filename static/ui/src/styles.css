@@ -32,3 +32,4 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .tag { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 3px; font-size: 11px; background: var(--soft); border: 1px solid var(--line); }
 .tag.link { color: #216e4e; }
 .tag.fact { color: #a54800; }
+.row.filter { margin: 4px 0 8px; }
