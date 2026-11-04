@@ -155,7 +155,9 @@ function PairTable({ pairs, onToggle, onEdit, onUndo, actionLabel = 'Not golden'
   const article = controlled ?? own;
   const setArticle = onArticle ?? setOwn;
   const titles = [...new Set(pairs.map((p) => p.articleTitle).filter(Boolean))].sort();
-  const shown = article ? pairs.filter((p) => p.articleTitle === article) : pairs;
+  // Natural order of request keys: NS-2 before NS-10, not between NS-19 and NS-20.
+  const byKey = (a, b) => a.id.localeCompare(b.id, undefined, { numeric: true });
+  const shown = (article ? pairs.filter((p) => p.articleTitle === article) : pairs).slice().sort(byKey);
   if (!pairs.length) return <p className="muted">Nothing here yet.</p>;
   return (
     <>
