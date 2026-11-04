@@ -14,6 +14,71 @@ modules:
         function: resolver
       viewportSize: large
       contentPropertyKey: golden-set-byline-6f1c2a
+  rovo:agent:
+    - key: golden-set-assistant
+      name: Golden Set
+      description: Tells which tested support answers a help article edit may have broken, and gives a re-test CSV for Rovo Evaluations.
+      prompt: >
+        You are Golden Set, an assistant for support admins who maintain a knowledge base in
+        Confluence and run support in Jira Service Management.
+
+        Golden Set keeps a set of verified question and answer pairs taken from resolved service
+        requests. Each pair relies on one help article. When an article is edited, some expected
+        answers may become wrong.
+
+        Use list-article-impacts to say which article edits affect which golden answers. Lead with
+        the article, the change (for example "30 days -> 14 days") and how many answers are likely
+        outdated, then list them with the suggested new answer. Use get-article-pairs to show the
+        golden answers that rely on an article. Use get-retest-csv when the user wants to re-test
+        an agent in Rovo Evaluations; give the CSV in a code block and say how to upload it.
+
+        Only report what the actions return. Never invent requests, answers or numbers. You cannot
+        change data; tell admins to accept edits on the Golden Set page in the service project.
+        Keep answers short.
+      conversationStarters:
+        - Which golden answers did the last article edit break?
+        - Show the golden answers for Returns policy
+        - Give me the re-test CSV for Returns policy
+      actions:
+        - list-article-impacts
+        - get-article-pairs
+        - get-retest-csv
+  action:
+    - key: list-article-impacts
+      name: List article edits that affect golden answers
+      function: rovo-list-impacts
+      actionVerb: GET
+      description: >
+        Lists help article edits since the golden set was built, the changed facts, and the golden
+        answers each edit makes likely outdated, with suggested new answers.
+      inputs:
+        articleTitle:
+          title: Article title
+          type: string
+          required: false
+          description: Optional title of one help article to focus on.
+    - key: get-article-pairs
+      name: Get golden answers for an article
+      function: rovo-article-pairs
+      actionVerb: GET
+      description: Returns the verified question and answer pairs that rely on a help article.
+      inputs:
+        articleTitle:
+          title: Article title
+          type: string
+          required: true
+          description: Title of the help article, for example Returns policy.
+    - key: get-retest-csv
+      name: Get re-test CSV for Rovo Evaluations
+      function: rovo-retest-csv
+      actionVerb: GET
+      description: Returns a CSV with the golden answers affected by an article edit, ready to upload as a Rovo Evaluations dataset.
+      inputs:
+        articleTitle:
+          title: Article title
+          type: string
+          required: true
+          description: Title of the help article that was edited.
   scheduledTrigger:
     - key: check-article-edits
       function: check-all
@@ -21,6 +86,12 @@ modules:
   function:
     - key: resolver
       handler: index.handler
+    - key: rovo-list-impacts
+      handler: rovo.listArticleImpacts
+    - key: rovo-article-pairs
+      handler: rovo.getArticlePairs
+    - key: rovo-retest-csv
+      handler: rovo.getRetestCsv
     - key: check-all
       handler: scheduled.scheduledCheck
       timeoutSeconds: 300

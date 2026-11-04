@@ -97,8 +97,10 @@ function useStepper(startFn, stepFn, isDone) {
   return { state, running, error, run };
 }
 
-function PairTable({ pairs, onToggle, actionLabel = 'Not golden' }) {
-  const [article, setArticle] = useState('');
+function PairTable({ pairs, onToggle, actionLabel = 'Not golden', article: controlled, onArticle }) {
+  const [own, setOwn] = useState('');
+  const article = controlled ?? own;
+  const setArticle = onArticle ?? setOwn;
   const titles = [...new Set(pairs.map((p) => p.articleTitle).filter(Boolean))].sort();
   const shown = article ? pairs.filter((p) => p.articleTitle === article) : pairs;
   if (!pairs.length) return <p className="muted">Nothing here yet.</p>;
@@ -335,9 +337,12 @@ function QueueApp() {
     (s) => s.phase === 'done'
   );
 
+  const [articleFilter, setArticleFilter] = useState('');
   const exportAll = async () => {
-    const files = await invoke('exportCsv', {});
-    files.forEach((csv, i) => download(files.length > 1 ? `golden-set-${i + 1}.csv` : 'golden-set.csv', csv));
+    const shown = articleFilter ? pairs.selected.filter((p) => p.articleTitle === articleFilter) : null;
+    const files = await invoke('exportCsv', shown ? { ids: shown.map((p) => p.id) } : {});
+    const base = articleFilter ? `golden-set-${articleFilter.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : 'golden-set';
+    files.forEach((csv, i) => download(files.length > 1 ? `${base}-${i + 1}.csv` : `${base}.csv`, csv));
   };
   const [busy, setBusy] = useState(false);
   const mark = (value) => async (id) => {
@@ -414,9 +419,9 @@ function QueueApp() {
         <section className="card">
           <div className="row spread">
             <h2>4. Golden pairs</h2>
-            <button onClick={exportAll} disabled={!pairs.selected.length}>Download CSV for Rovo Evaluations</button>
+            <button onClick={exportAll} disabled={!pairs.selected.length}>{articleFilter ? `Download CSV for ${articleFilter}` : 'Download CSV for Rovo Evaluations'}</button>
           </div>
-          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin && !busy ? mark(true) : null} />
+          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin && !busy ? mark(true) : null} article={articleFilter} onArticle={setArticleFilter} />
         </section>
       )}
 
