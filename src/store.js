@@ -32,3 +32,20 @@ export async function clearList(prefix) {
   for (let i = 0; i < count; i += 1) await kvs.delete(`${prefix}:${i}`);
   await kvs.delete(`${prefix}:count`);
 }
+
+/**
+ * Storage view for one JSM project: every key is prefixed with the project key, so each service
+ * project keeps its own golden set and settings.
+ */
+export function forProject(projectKey) {
+  const p = (k) => `p:${projectKey}:${k}`;
+  return {
+    get: (k) => get(p(k)),
+    set: (k, v) => set(p(k), v),
+    del: (k) => del(p(k)),
+    setList: (k, items) => setList(p(k), items),
+    getList: (k) => getList(p(k)),
+    appendChunk: (k, i, items) => appendChunk(p(k), i, items),
+    clearList: (k) => clearList(p(k)),
+  };
+}

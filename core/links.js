@@ -25,6 +25,8 @@ export function findPageRefs(text) {
 export function stripLinks(text) {
   return String(text || '')
     .replace(/https?:\/\/\S+/g, '')
+    // Relative or broken page links such as "/wiki/spaces/HELP/pages/123" or "undefined/wiki/...".
+    .replace(/\S*\/wiki\/\S+/g, '')
     .replace(/\s+([.,!?])/g, '$1')
     .replace(/[ \t]{2,}/g, ' ')
     .trim();

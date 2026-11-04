@@ -7,7 +7,6 @@
 //   low-CSAT examples are therefore seeded as reopened requests, which is how they usually end anyway.
 import { route } from './forge.js';
 import { call } from './http.js';
-import * as store from './store.js';
 import { ARTICLES, GOLDEN, NO_LINK, BAD, DUPLICATE_OF } from '../seed/data.mjs';
 
 const STATE = 'seed:state';
@@ -28,12 +27,12 @@ export function seedPlan() {
   return plan;
 }
 
-export async function seedState() {
-  return (await store.get(STATE)) || { phase: 'idle' };
+export async function seedState(db) {
+  return (await db.get(STATE)) || { phase: 'idle' };
 }
 
-export async function resetSeed() {
-  await store.del(STATE);
+export async function resetSeed(db) {
+  await db.del(STATE);
 }
 
 async function requestTypeId(serviceDeskId) {
@@ -114,9 +113,9 @@ function replyText(spec, customer, agentName, pageUrl, n) {
 
 // Resumable: progress for the request in flight is kept in st.current, so a failed step is retried
 // without raising the same request twice.
-async function createRequest(spec, n, st, siteUrl, agentName) {
+async function createRequest(spec, n, st, siteUrl, agentName, db) {
   const customer = st.customers[n % st.customers.length];
-  if (st.current?.index === n) return finishRequest(spec, n, st, customer, siteUrl, agentName);
+  if (st.current?.index === n) return finishRequest(spec, n, st, customer, siteUrl, agentName, db);
   const created = await call('user', 'jira', route`/rest/servicedeskapi/request`, {
     method: 'POST',
     body: {
@@ -127,13 +126,13 @@ async function createRequest(spec, n, st, siteUrl, agentName) {
     },
   });
   st.current = { index: n, key: created.issueKey, step: 'comment' };
-  await store.set(STATE, st);
-  return finishRequest(spec, n, st, customer, siteUrl, agentName);
+  await db.set(STATE, st);
+  return finishRequest(spec, n, st, customer, siteUrl, agentName, db);
 }
 
-async function finishRequest(spec, n, st, customer, siteUrl, agentName) {
+async function finishRequest(spec, n, st, customer, siteUrl, agentName, db) {
   const cur = st.current;
-  const save = () => store.set(STATE, st);
+  const save = () => db.set(STATE, st);
   if (cur.step === 'comment') {
     const realPage = spec.page ? st.pages[spec.page] : null;
     const pageUrl = realPage ? `${siteUrl}/wiki/spaces/${st.spaceKey}/pages/${realPage}` : null;
@@ -165,11 +164,12 @@ async function finishRequest(spec, n, st, customer, siteUrl, agentName) {
 
 /**
  * Runs one step and returns the new state. The UI calls it until phase === 'done'.
+ * @param {object} db project-scoped storage from store.forProject
  * @param {{ serviceDeskId: string, spaceId: string, spaceKey: string }} config
  * @param {{ siteUrl: string, agentName: string }} ctx
  */
-export async function seedNext(config, ctx) {
-  let st = await seedState();
+export async function seedNext(db, config, ctx) {
+  let st = await seedState(db);
   const plan = seedPlan();
 
   if (st.phase === 'idle' || st.phase === 'error') {
@@ -186,7 +186,7 @@ export async function seedNext(config, ctx) {
     } else if (st.phase === 'requests') {
       const from = st.created.length;
       for (let i = from; i < Math.min(from + PER_STEP, plan.length); i += 1) {
-        st.created.push(await createRequest(plan[i], i, st, ctx.siteUrl, ctx.agentName));
+        st.created.push(await createRequest(plan[i], i, st, ctx.siteUrl, ctx.agentName, db));
       }
       if (st.created.length >= plan.length) st.phase = 'done';
     }
@@ -195,6 +195,6 @@ export async function seedNext(config, ctx) {
     st.error = String(e.message || e);
     st.phase = st.phase === 'requests' ? 'requests' : st.phase;
   }
-  await store.set(STATE, st);
+  await db.set(STATE, st);
   return st;
 }

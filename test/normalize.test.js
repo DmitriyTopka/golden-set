@@ -26,6 +26,10 @@ describe('normalizeAnswer', () => {
     expect(normalizeAnswer('within 24 hours')).toBe('Within 24 hours.');
   });
 
+  test('drops a dangling "More details:" left after the link is stripped', () => {
+    expect(normalizeAnswer('Hi [name],\nOpened earbuds cannot be returned. More details:\nBest regards,\n[name]')).toBe('Opened earbuds cannot be returned.');
+  });
+
   test('returns empty string for pure pleasantries', () => {
     expect(normalizeAnswer('Hi [name],\nHope this helps!\nKind regards,\n[name]')).toBe('');
     expect(normalizeAnswer('')).toBe('');

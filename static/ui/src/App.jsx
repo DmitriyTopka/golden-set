@@ -2,6 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { invoke } from '@forge/bridge';
 
 const TAGLINE = 'See which support answers break when you edit a help article.';
+const REASONS = {
+  no_public_agent_answer: 'No public answer from an agent',
+  reopened: 'Reopened after it was resolved',
+  customer_followed_up: 'Customer wrote back after the answer',
+  low_csat: 'Low satisfaction rating',
+  empty_question: 'Empty question',
+  marked_not_golden: 'Marked "not golden" by an admin',
+};
 
 function download(name, text) {
   const blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
@@ -16,49 +24,46 @@ function download(name, text) {
 }
 
 function Setup({ overview, onSaved }) {
-  const [sources, setSources] = useState(null);
-  const [desk, setDesk] = useState(overview.config?.serviceDeskId || '');
+  const [spaces, setSpaces] = useState(null);
   const [space, setSpace] = useState(overview.config?.spaceKey || '');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    invoke('listSources').then(setSources).catch((e) => setError(e.message));
-  }, []);
+    if (overview.isAdmin) invoke('listSources').then((r) => setSpaces(r.spaces)).catch((e) => setError(e.message));
+  }, [overview.isAdmin]);
 
   const save = async () => {
     setError('');
     try {
-      await invoke('saveConfig', { serviceDeskId: desk, spaceKey: space });
+      await invoke('saveConfig', { spaceKey: space });
       onSaved();
     } catch (e) {
       setError(e.message);
     }
   };
 
-  if (!sources) return <p className="muted">{error || 'Loading service projects and spaces…'}</p>;
+  if (!overview.isAdmin) {
+    return overview.config ? null : <p className="muted">A project administrator needs to connect a knowledge base space first.</p>;
+  }
+  if (!spaces) return <p className="muted">{error || 'Loading Confluence spaces…'}</p>;
   return (
     <section className="card">
-      <h2>1. Where should Golden Set look?</h2>
+      <h2>1. Which knowledge base do agents answer from?</h2>
       <div className="row">
         <label>
           Service project
-          <select value={desk} onChange={(e) => setDesk(e.target.value)}>
-            <option value="">Choose…</option>
-            {sources.desks.map((d) => (
-              <option key={d.id} value={d.id}>{`${d.name} (${d.projectKey})`}</option>
-            ))}
-          </select>
+          <input value={overview.projectKey} disabled />
         </label>
         <label>
           Knowledge base space
           <select value={space} onChange={(e) => setSpace(e.target.value)}>
             <option value="">Choose…</option>
-            {sources.spaces.map((s) => (
+            {spaces.map((s) => (
               <option key={s.key} value={s.key}>{`${s.name} (${s.key})`}</option>
             ))}
           </select>
         </label>
-        <button disabled={!desk || !space} onClick={save}>Save</button>
+        <button disabled={!space} onClick={save}>Save</button>
       </div>
       {error && <p className="error">{error}</p>}
     </section>
@@ -117,7 +122,7 @@ function PairTable({ pairs, onToggle }) {
             </td>
             <td>{p.score}</td>
             <td>
-              <button className="subtle" onClick={() => onToggle(p.id)}>Not golden</button>
+              {onToggle && <button className="subtle" onClick={() => onToggle(p.id)}>Not golden</button>}
             </td>
           </tr>
         ))}
@@ -180,7 +185,7 @@ export default function App() {
 
       <Setup overview={overview} onSaved={refresh} />
 
-      {overview.config && (
+      {overview.config && overview.isAdmin && (
         <section className="card">
           <h2>2. Build the golden set</h2>
           <p className="muted">
@@ -191,6 +196,7 @@ export default function App() {
             <button onClick={async () => { await scan.run(); await refresh(); }} disabled={scan.running}>
               {scan.running ? `Reading requests… ${scan.state?.done ?? 0}/${scan.state?.total ?? '?'}` : 'Scan resolved requests'}
             </button>
+            {!(s?.requests > 0 && overview.seed?.phase !== 'requests') && (
             <button className="subtle" onClick={async () => { await seed.run(); await refresh(); }} disabled={seed.running || overview.seed?.phase === 'done'}>
               {seed.running
                 ? `Loading demo data… ${seed.state?.phase === 'requests' ? `${seed.state.created.length}/${seed.state.total}` : seed.state?.phase || ''}`
@@ -198,6 +204,7 @@ export default function App() {
                   ? 'Demo data loaded'
                   : 'Load demo data (Northwind Gear)'}
             </button>
+            )}
           </div>
           {(scan.error || seed.error) && <p className="error">{scan.error || seed.error}</p>}
           {s && (
@@ -217,7 +224,45 @@ export default function App() {
             <h2>3. Golden pairs</h2>
             <button onClick={exportAll} disabled={!pairs.selected.length}>Download CSV for Rovo Evaluations</button>
           </div>
-          <PairTable pairs={pairs.selected} onToggle={toggle} />
+          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin ? toggle : null} />
+        </section>
+      )}
+
+      {s && (
+        <section className="card">
+          <details>
+            <summary>
+              <b>Why requests were left out</b> ({pairs.rejected.length} rejected, {pairs.duplicates.length} duplicates, {pairs.reserve.length} in reserve)
+            </summary>
+            <table>
+              <thead>
+                <tr>
+                  <th>Request</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pairs.rejected.map((r) => (
+                  <tr key={`r-${r.id}`}>
+                    <td className="mono">{r.id}</td>
+                    <td>{REASONS[r.reason] || r.reason}</td>
+                  </tr>
+                ))}
+                {pairs.duplicates.map((d) => (
+                  <tr key={`d-${d.id}`}>
+                    <td className="mono">{d.id}</td>
+                    <td>Same question as {d.duplicateOf}</td>
+                  </tr>
+                ))}
+                {pairs.reserve.map((p) => (
+                  <tr key={`v-${p.id}`}>
+                    <td className="mono">{p.id}</td>
+                    <td>{p.link ? `Reserve: lower score (${p.score})` : 'No help article found for this answer'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
         </section>
       )}
     </main>

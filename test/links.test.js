@@ -22,5 +22,7 @@ describe('stripLinks', () => {
   test('removes urls and tidies punctuation', () => {
     expect(stripLinks('More details: https://a.b/c .')).toBe('More details:.');
     expect(stripLinks('')).toBe('');
+    expect(stripLinks('More details: undefined/wiki/spaces/NHC/pages/3371713.')).toBe('More details:');
+    expect(stripLinks('see /wiki/spaces/HELP/pages/1 now')).toBe('see now');
   });
 });

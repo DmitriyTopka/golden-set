@@ -20,6 +20,7 @@ const FILLER = [
   /sorry (for|about) the (wait|delay|trouble|inconvenience)/i,
   /have a (great|nice|good) (day|week)/i,
   /i('| a)m closing this (ticket|request)/i,
+  /more (details|info(rmation)?)\s*(here|below)?\s*:/i,
 ];
 const PLEASANTRY = /^(thanks|thank you|cheers|many thanks)[!.]?$/i;
 
