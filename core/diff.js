@@ -91,3 +91,40 @@ export function computeImpact(pairs, diff) {
     counts: { affected: affected.length, outdated, recheck: affected.length - outdated },
   };
 }
+
+const numberOf = (key) => {
+  const m = key.match(/:(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/);
+  return m ? m.slice(1).filter(Boolean) : [];
+};
+
+/**
+ * Suggests an updated expected answer by swapping the changed numbers, e.g. "30 days" -> "14 days".
+ * Only touches facts written with digits; "thirty days" gets no suggestion rather than a wrong one.
+ * @returns {string|null} the new text, or null when nothing could be swapped safely
+ */
+export function suggestFix(expected, outdatedFacts) {
+  let out = String(expected || '');
+  let changed = false;
+  const present = extractFacts(out);
+  for (const f of outdatedFacts) {
+    if (!f.replacedBy) continue;
+    const replacement = extractFacts(f.replacedBy)[0];
+    if (!replacement) continue;
+    const oldNums = numberOf(f.key);
+    const newNums = numberOf(replacement.key);
+    if (oldNums.length !== newNums.length || oldNums.length === 0) continue;
+    for (const p of present.filter((x) => x.key === f.key)) {
+      if (!/\d/.test(p.raw)) continue;
+      // Rebuild the phrase from its own wording so "30-day" stays "14-day" and "30 days" stays "14 days".
+      let next = p.raw;
+      oldNums.forEach((n, i) => {
+        next = next.replace(new RegExp(`(^|[^\\d.])${n.replace('.', '\\.')}(?![\\d])`), `$1${newNums[i]}`);
+      });
+      if (next !== p.raw) {
+        out = out.split(p.raw).join(next);
+        changed = true;
+      }
+    }
+  }
+  return changed ? out : null;
+}

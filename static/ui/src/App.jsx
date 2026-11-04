@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { invoke } from '@forge/bridge';
+import { invoke, view } from '@forge/bridge';
 
 const TAGLINE = 'See which support answers break when you edit a help article.';
 const REASONS = {
@@ -148,16 +148,171 @@ function PairTable({ pairs, onToggle, actionLabel = 'Not golden' }) {
   );
 }
 
-export default function App() {
+const STATUS = {
+  likely_outdated: { label: 'Likely outdated', cls: 'bad' },
+  recheck: { label: 'Re-check', cls: 'warn' },
+  facts_not_detected_recheck_all: { label: 'Re-check (no fact detected)', cls: 'warn' },
+  new_text_only: { label: 'New text added', cls: 'info' },
+};
+
+function StatusTag({ status }) {
+  const s = STATUS[status];
+  return s ? <span className={`status ${s.cls}`}>{s.label}</span> : null;
+}
+
+function ImpactCard({ r, isAdmin, onDone, onError }) {
+  const [busy, setBusy] = useState(false);
+  const suggestions = r.affected.filter((a) => a.suggestion).length;
+  const exportRetest = async () => {
+    const files = await invoke('exportCsv', { ids: r.affected.map((a) => a.id) });
+    files.forEach((csv, i) => download(`retest-${r.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}${files.length > 1 ? `-${i + 1}` : ''}.csv`, csv));
+  };
+  const accept = async (applySuggestions) => {
+    setBusy(true);
+    try {
+      await invoke('acceptEdit', { pageId: r.pageId, applySuggestions });
+      await onDone();
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="impact">
+      <div className="row spread">
+        <div>
+          <h3>{r.title} was edited</h3>
+          <p className="muted">
+            Version {r.fromVersion} to {r.toVersion}
+            {r.changes.length > 0 && <> · {r.changes.map((c) => (c.to ? `${c.from} -> ${c.to}` : `${c.from} removed`)).join(', ')}</>}
+            {r.changes.length === 0 && r.removedTerms.length > 0 && <> · wording removed: {r.removedTerms.slice(0, 3).join(', ')}</>}
+          </p>
+        </div>
+        <p className="big">
+          <b>{r.counts.affected}</b> golden answers depend on this page, <b className="bad-text">{r.counts.outdated}</b> likely outdated
+        </p>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Request</th>
+            <th>Customer question</th>
+            <th>Expected answer</th>
+            <th>Status</th>
+            <th>Suggested answer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {r.affected.map((a) => (
+            <tr key={a.id}>
+              <td className="mono">{a.id}</td>
+              <td>{a.question}</td>
+              <td>{a.expected}</td>
+              <td><StatusTag status={a.status} />{a.reasons?.length > 0 && <div className="muted small">{a.reasons.join('; ')}</div>}</td>
+              <td>{a.suggestion || <span className="muted">-</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="row">
+        <button onClick={exportRetest}>Download re-test CSV ({r.affected.length})</button>
+        {isAdmin && suggestions > 0 && (
+          <button className="subtle" disabled={busy} onClick={() => accept(true)}>Apply {suggestions} suggested answers and accept edit</button>
+        )}
+        {isAdmin && (
+          <button className="subtle" disabled={busy} onClick={() => accept(false)}>Accept edit without changes</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CheckNow({ pairs, onDone, onError }) {
+  const pages = [...new Map(pairs.filter((p) => p.link).map((p) => [p.link.pageId, p.articleTitle])).entries()];
+  const [pageId, setPageId] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState('');
+  const run = async () => {
+    setBusy(true);
+    setNote('');
+    try {
+      const r = await invoke('checkNow', { pageId });
+      const NOTES = {
+        changed: '',
+        no_change: 'No change since the golden set was built.',
+        no_pairs: 'No golden pairs rely on this article.',
+        no_baseline: 'Run a scan first, so Golden Set knows what the article said.',
+        page_not_found: 'The article could not be read.',
+      };
+      setNote(NOTES[r?.reason] ?? `Unexpected result: ${JSON.stringify(r)}`);
+      await onDone();
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="row">
+      <label>
+        Check an article now
+        <select value={pageId} onChange={(e) => setPageId(e.target.value)}>
+          <option value="">Choose…</option>
+          {pages.map(([id, title]) => (
+            <option key={id} value={id}>{title || id}</option>
+          ))}
+        </select>
+      </label>
+      <button disabled={!pageId || busy} onClick={run}>{busy ? 'Checking…' : 'Check now'}</button>
+      {note && <span className="muted">{note}</span>}
+    </div>
+  );
+}
+
+function BylineView() {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState('');
+  useEffect(() => {
+    invoke('getPageView').then(setData).catch((e) => setError(e.message));
+  }, []);
+  if (error) return <p className="error">{error}</p>;
+  if (!data) return <p className="muted">Loading…</p>;
+  if (data.projects.length === 0) return <main><p className="muted">No golden answers rely on this page yet.</p></main>;
+  return (
+    <main>
+      {data.projects.map((pr) => (
+        <section key={pr.projectKey} className="card">
+          <h2>{pr.total} golden answers in service project {pr.projectKey} rely on this page</h2>
+          {pr.outdated > 0 ? (
+            <p className="bad-text">After the last edit, {pr.outdated} of them are likely outdated.</p>
+          ) : (
+            <p className="muted">None of them look outdated.</p>
+          )}
+          <p className="muted">
+            Customer questions stay in Jira Service Management. Open {pr.projectKey}, then Queues, then Golden Set to see the answers and download a re-test CSV for Rovo Evaluations.
+          </p>
+        </section>
+      ))}
+    </main>
+  );
+}
+
+function QueueApp() {
   const [overview, setOverview] = useState(null);
   const [pairs, setPairs] = useState(null);
+  const [impacts, setImpacts] = useState([]);
   const [error, setError] = useState('');
 
   const refresh = useCallback(async () => {
     try {
-      const [ov, pr] = await Promise.all([invoke('getOverview'), invoke('getPairs')]);
+      const ov = await invoke('getOverview');
+      // Admins check articles on open, so an edit shows up without waiting for the 5-minute schedule.
+      if (ov.isAdmin && ov.summary) await invoke('refreshImpacts').catch(() => null);
+      const [pr, im] = await Promise.all([invoke('getPairs'), invoke('getImpacts').catch(() => [])]);
       setOverview(ov);
       setPairs(pr);
+      setImpacts(im);
     } catch (e) {
       setError(e.message);
     }
@@ -245,8 +400,20 @@ export default function App() {
 
       {s && (
         <section className="card">
+          <h2>3. Article changes</h2>
+          <p className="muted">Golden Set checks the articles every five minutes and each time this page opens. You can also check one now.</p>
+          {overview.isAdmin && <CheckNow pairs={pairs.selected} onDone={refresh} onError={setError} />}
+          {impacts.length === 0 && <p className="muted">No article has changed since the golden set was built.</p>}
+          {impacts.map((r) => (
+            <ImpactCard key={r.pageId} r={r} isAdmin={overview.isAdmin} onDone={refresh} onError={setError} />
+          ))}
+        </section>
+      )}
+
+      {s && (
+        <section className="card">
           <div className="row spread">
-            <h2>3. Golden pairs</h2>
+            <h2>4. Golden pairs</h2>
             <button onClick={exportAll} disabled={!pairs.selected.length}>Download CSV for Rovo Evaluations</button>
           </div>
           <PairTable pairs={pairs.selected} onToggle={overview.isAdmin && !busy ? mark(true) : null} />
@@ -299,4 +466,13 @@ export default function App() {
       )}
     </main>
   );
+}
+
+export default function App() {
+  const [type, setType] = useState(null);
+  useEffect(() => {
+    view.getContext().then((c) => setType(c?.extension?.type || 'unknown')).catch(() => setType('unknown'));
+  }, []);
+  if (!type) return null;
+  return type === 'confluence:contentBylineItem' ? <BylineView /> : <QueueApp />;
 }

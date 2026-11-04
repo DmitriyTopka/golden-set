@@ -5,9 +5,25 @@ modules:
       resolver:
         function: resolver
       title: Golden Set
+  confluence:contentBylineItem:
+    - key: golden-set-byline
+      title: Golden Set
+      tooltip: Golden answers that rely on this article
+      resource: main
+      resolver:
+        function: resolver
+      viewportSize: large
+      contentPropertyKey: golden-set-byline-6f1c2a
+  scheduledTrigger:
+    - key: check-article-edits
+      function: check-all
+      interval: fiveMinute
   function:
     - key: resolver
       handler: index.handler
+    - key: check-all
+      handler: scheduled.scheduledCheck
+      timeoutSeconds: 300
 resources:
   - key: main
     path: static/ui/dist

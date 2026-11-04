@@ -6,5 +6,5 @@ export { findPageRefs } from './links.js';
 export { buildCandidate, isReopened, REJECT } from './pairs.js';
 export { indexArticles, linkPair } from './link.js';
 export { selectGoldenSet, dedupe, balancedTop, pairsByPage, reselect, DEFAULT_LIMIT } from './select.js';
-export { diffArticle, computeImpact, IMPACT } from './diff.js';
+export { diffArticle, computeImpact, suggestFix, IMPACT } from './diff.js';
 export { toCsv, toCsvChunks, parseCsv, validateCsv, CHUNK_SIZE } from './csv.js';

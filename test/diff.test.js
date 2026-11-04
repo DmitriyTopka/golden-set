@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { diffArticle, computeImpact, IMPACT } from '../core/diff.js';
+import { diffArticle, computeImpact, suggestFix, IMPACT } from '../core/diff.js';
 import { selectGoldenSet, pairsByPage } from '../core/select.js';
 
 const RETURNS = [
@@ -117,5 +117,28 @@ describe('computeImpact', () => {
     const page = seed.articles.find((a) => a.pageId === '100001');
     const impact = computeImpact(selected.filter((p) => ids.has(p.id)), diffArticle(page.body, seed.demoEdit.body));
     expect(impact.counts).toEqual({ affected: 12, outdated: 8, recheck: 4 });
+  });
+});
+
+describe('suggestFix', () => {
+  const d = diffArticle(RETURNS, edit('30 days', '14 days'));
+  test('swaps the number and keeps the wording', () => {
+    expect(suggestFix('You have 30 days from delivery.', d.outdatedFacts)).toBe('You have 14 days from delivery.');
+    expect(suggestFix('Yes, sale items have the same 30-day return window.', d.outdatedFacts)).toBe('Yes, sale items have the same 14-day return window.');
+  });
+  test('money and percent', () => {
+    const m = diffArticle('Express costs $12.', 'Express costs $15.');
+    expect(suggestFix('It costs $12 and arrives tomorrow.', m.outdatedFacts)).toBe('It costs $15 and arrives tomorrow.');
+    const p = diffArticle(RETURNS, edit('15%', '20%'));
+    expect(suggestFix('A 15% restocking fee applies.', p.outdatedFacts)).toBe('A 20% restocking fee applies.');
+  });
+  test('no suggestion for word numbers, unrelated text or removed facts', () => {
+    expect(suggestFix('You have thirty days.', d.outdatedFacts)).toBeNull();
+    expect(suggestFix('Returns are free.', d.outdatedFacts)).toBeNull();
+    const removed = diffArticle(RETURNS, RETURNS.replace('Opened laptops and tablets have a 15% restocking fee.', ''));
+    expect(suggestFix('A 15% fee applies.', removed.outdatedFacts)).toBeNull();
+  });
+  test('does not touch other numbers that only look similar', () => {
+    expect(suggestFix('Order 1300 items within 30 days of delivery.', d.outdatedFacts)).toBe('Order 1300 items within 14 days of delivery.');
   });
 });

@@ -33,3 +33,12 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .tag.link { color: #216e4e; }
 .tag.fact { color: #a54800; }
 .row.filter { margin: 4px 0 8px; }
+.impact { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; }
+.impact h3 { margin: 0; font-size: 15px; }
+.big { font-size: 15px; margin: 0; }
+.small { font-size: 12px; }
+.status { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+.status.bad { background: #ffeceb; color: #ae2e24; }
+.status.warn { background: #fff7d6; color: #7f5f01; }
+.status.info { background: #e9f2ff; color: #0055cc; }
+.bad-text { color: #ae2e24; }

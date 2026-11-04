@@ -11,6 +11,7 @@ import { forProject } from './store.js';
 import { listServiceDesks, statusCategories, closedRequestKeys, readRequests } from './jsm.js';
 import { readArticles } from './confluence.js';
 import { seedNext, seedState, resetSeed } from './seed.js';
+import { registerProject, publishByline, readByline, saveBaselines, checkPage, checkProject, listImpacts, acceptEdit } from './impact.js';
 import { selectGoldenSet, reselect, toCsvChunks } from '../core/index.js';
 
 const resolver = new Resolver();
@@ -50,8 +51,19 @@ const configOf = async (db) => (await db.get('config')) || null;
 /** Every key that holds pairs or anything derived from them. Cleared together when the space changes. */
 const PAIR_LISTS = ['pairs:selected', 'pairs:reserve', 'pairs:excluded'];
 const PAIR_KEYS = ['pairs:rejected', 'pairs:duplicates', 'result:summary', 'articles:versions', 'excluded'];
-async function clearResults(db) {
+async function clearResults(db, projectKey) {
+  const versions = (await db.get('articles:versions')) || {};
+  await clearImpacts(db);
+  await Promise.all(Object.keys(versions).map((id) => db.del(`snap:${id}`)));
+  const dropped = await registerProject(projectKey, []);
+  for (const id of dropped) await publishByline(id, projectKey, null).catch(() => null);
   await Promise.all([...PAIR_LISTS.map((k) => db.clearList(k)), ...PAIR_KEYS.map((k) => db.del(k))]);
+}
+
+async function clearImpacts(db) {
+  const ids = (await db.get('impacts')) || [];
+  await Promise.all(ids.map((id) => db.del(`impact:${id}`)));
+  await db.del('impacts');
 }
 
 resolver.define('getOverview', async ({ context }) => {
@@ -87,7 +99,7 @@ resolver.define('saveConfig', async ({ payload, context }) => {
   const previous = await configOf(db);
   if (previous && previous.spaceId !== cfg.spaceId) {
     // Pairs quote articles of the old space; drop them so readers are never checked against the wrong space.
-    await clearResults(db);
+    await clearResults(db, projectKey);
   }
   await db.set('config', cfg);
   return cfg;
@@ -154,6 +166,13 @@ resolver.define('scanFinish', async ({ context }) => {
   await db.set('pairs:rejected', result.rejected);
   await db.set('pairs:duplicates', result.duplicates);
   await db.set('articles:versions', Object.fromEntries(articles.map((a) => [a.pageId, a.version])));
+  // Fresh pairs were written against today's articles: they become the baseline for edit checks.
+  await clearImpacts(db);
+  await saveBaselines(db, articles);
+  const usedPages = [...new Set(next.selected.map((p) => p.link?.pageId).filter(Boolean))];
+  const dropped = await registerProject(cfg.projectKey, usedPages);
+  for (const id of usedPages) await publishByline(id, cfg.projectKey, { total: next.selected.filter((p) => p.link?.pageId === id).length, outdated: 0 });
+  for (const id of dropped) await publishByline(id, cfg.projectKey, null).catch(() => null);
   // Raw requests carry unredacted customer text; keep only the redacted pairs once selection is done.
   await db.clearList('raw');
   const summary = { ...result.stats, selected: next.selected.length, excludedByAdmin: next.excluded.length, articles: articles.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
@@ -231,6 +250,46 @@ resolver.define('markNotGolden', async ({ payload, context }) => {
   return { selected: next.selected.length, excluded: next.excluded.length };
 });
 
+resolver.define('getImpacts', async ({ context }) => {
+  const db = await readerDb(context);
+  const impacts = await listImpacts(db);
+  const ids = [...new Set(impacts.flatMap((r) => r.affected.map((a) => a.id)))];
+  const visible = await visibleKeys(ids);
+  return impacts.map((r) => {
+    const affected = r.affected.filter((a) => visible.has(a.id));
+    return { ...r, affected, counts: { affected: affected.length, outdated: affected.filter((a) => a.status === 'likely_outdated').length } };
+  });
+});
+
+resolver.define('checkNow', async ({ payload, context }) => {
+  const { projectKey } = await guard(context, 'admin');
+  const res = await checkPage(projectKey, payload.pageId);
+  console.log(`checkNow ${projectKey} page ${payload.pageId}: ${res.reason}`);
+  return res;
+});
+
+// Opening the page checks for article edits at once, so nobody waits for the five-minute schedule.
+resolver.define('refreshImpacts', async ({ context }) => {
+  const { projectKey } = await guard(context, 'admin');
+  const results = await checkProject(projectKey);
+  return results.map((r) => ({ pageId: r.pageId, reason: r.reason }));
+});
+
+resolver.define('acceptEdit', async ({ payload, context }) => {
+  const { projectKey } = await guard(context, 'admin');
+  return acceptEdit(projectKey, payload.pageId, { applySuggestions: Boolean(payload.applySuggestions) });
+});
+
+/**
+ * Confluence byline dialog. Runs in the Confluence installation, which cannot read the Jira
+ * installation's storage, so it shows the counts the Jira side published on the page.
+ */
+resolver.define('getPageView', async ({ context }) => {
+  const pageId = String(context?.extension?.content?.id || '');
+  const value = await readByline(pageId);
+  return { pageId, projects: Object.entries(value?.projects || {}).map(([projectKey, c]) => ({ projectKey, ...c })) };
+});
+
 resolver.define('exportCsv', async ({ payload, context }) => {
   const db = await readerDb(context);
   const all = await db.getList('pairs:selected');
@@ -242,3 +301,4 @@ resolver.define('exportCsv', async ({ payload, context }) => {
 });
 
 export const handler = resolver.getDefinitions();
+
