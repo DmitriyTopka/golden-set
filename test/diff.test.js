@@ -161,6 +161,9 @@ describe('suggestAnswer', () => {
     expect(review('Delivered 25 days ago, can I return it?', 'Yes, you can still return it within 30 days.')).toBe('verdict_depends_on_elapsed_time');
     expect(review('It came last month.', 'Sorry, it is too late: the window is 30 days.')).toBe('verdict_depends_on_elapsed_time');
     expect(review('Bought it two weeks ago.', 'No problem, 30 days from delivery, you are within the window.')).toBe('verdict_depends_on_elapsed_time');
+    // An admin-written answer after the first edit, checked again when the article goes back to 30 days.
+    const back = diffArticle(edit('30 days', '14 days'), RETURNS);
+    expect(suggestAnswer(pair('It arrived about three weeks ago.', 'Three weeks is past our 14-day window, so it cannot be returned.'), back.outdatedFacts).needsReview).toBe('verdict_depends_on_elapsed_time');
   });
 
   test('a conditional answer is still safe to update (NS-6)', () => {

@@ -133,7 +133,7 @@ export function suggestFix(expected, outdatedFacts) {
 const COUNT = '(?:\\d+|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a few|few|several|a couple of)';
 const ELAPSED = new RegExp(`\\b(?:(?:about|around|almost|nearly|over|just over|more than|less than)\\s+)?${COUNT}\\s+(?:day|week|month|year)s?\\s+ago\\b|\\blast\\s+(?:week|month|year)\\b`, 'i');
 // A sentence that decides the case: yes or no, still in time, too late, within or outside the window.
-const VERDICT = /^\s*(?:yes|no)\b|\b(?:still|in time|too late|no longer|already|expired|within the window|outside the window|not eligible|eligible|you cannot|you can't)\b/i;
+const VERDICT = /^\s*(?:yes|no)\b|\b(?:still|in time|too late|no longer|already|expired|past (?:the|our|your)|within the window|outside the window|not eligible|eligible|cannot|can't|can not)\b/i;
 // The same words inside a condition do not decide anything: "If it arrived less than 30 days ago you can still return it."
 const CONDITION = /\b(?:if|as long as|unless|provided that|when)\b/i;
 

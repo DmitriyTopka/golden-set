@@ -8,3 +8,4 @@ export { indexArticles, linkPair } from './link.js';
 export { selectGoldenSet, dedupe, balancedTop, pairsByPage, reselect, DEFAULT_LIMIT } from './select.js';
 export { diffArticle, computeImpact, suggestFix, suggestAnswer, verdictDependsOnElapsedTime, IMPACT } from './diff.js';
 export { toCsv, toCsvChunks, parseCsv, validateCsv, CHUNK_SIZE } from './csv.js';
+export { cleanExpected, applyEdits, undoEdit, MAX_EXPECTED } from './edits.js';

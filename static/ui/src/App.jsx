@@ -97,7 +97,59 @@ function useStepper(startFn, stepFn, isDone) {
   return { state, running, error, run };
 }
 
-function PairTable({ pairs, onToggle, actionLabel = 'Not golden', article: controlled, onArticle }) {
+/** Expected answer cell. Admins can rewrite it; the original stays visible on hover. */
+function EditableAnswer({ id, text, edited, onSave, onUndo }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(text);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState('');
+  const start = () => {
+    setDraft(text);
+    setErr('');
+    setEditing(true);
+  };
+  const save = async () => {
+    setSaving(true);
+    setErr('');
+    try {
+      await onSave(id, draft);
+      setEditing(false);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+  if (!editing) {
+    return (
+      <>
+        {text}
+        {edited && <span className="tag edited" title={`Original: ${edited.from}`}>edited</span>}
+        {onSave && (
+          <div className="row tight">
+            <button className="link-button" onClick={start}>Edit</button>
+            {edited && onUndo && (
+              <button className="link-button" disabled={saving} onClick={async () => { setSaving(true); try { await onUndo(id); } catch (e) { setErr(e.message); } finally { setSaving(false); } }}>Undo edit</button>
+            )}
+          </div>
+        )}
+        {err && <p className="error small">{err}</p>}
+      </>
+    );
+  }
+  return (
+    <div className="editor">
+      <textarea aria-label={`Expected answer for ${id}`} value={draft} rows={3} maxLength={1000} onChange={(e) => setDraft(e.target.value)} autoFocus />
+      <div className="row">
+        <button onClick={save} disabled={saving || !draft.trim()}>{saving ? 'Saving…' : 'Save'}</button>
+        <button className="subtle" onClick={() => setEditing(false)} disabled={saving}>Cancel</button>
+      </div>
+      {err && <p className="error small">{err}</p>}
+    </div>
+  );
+}
+
+function PairTable({ pairs, onToggle, onEdit, onUndo, actionLabel = 'Not golden', article: controlled, onArticle }) {
   const [own, setOwn] = useState('');
   const article = controlled ?? own;
   const setArticle = onArticle ?? setOwn;
@@ -135,7 +187,7 @@ function PairTable({ pairs, onToggle, actionLabel = 'Not golden', article: contr
             <tr key={p.id}>
               <td className="mono">{p.id}</td>
               <td>{p.question}</td>
-              <td>{p.expected}</td>
+              <td><EditableAnswer id={p.id} text={p.expected} edited={p.edited} onSave={onEdit} onUndo={onUndo} /></td>
               <td>
                 {p.articleTitle || '-'}
                 {p.link && <span className={`tag ${p.link.method}`}>{p.link.method === 'link' ? 'linked' : 'by fact'}</span>}
@@ -162,7 +214,7 @@ function StatusTag({ status }) {
   return s ? <span className={`status ${s.cls}`}>{s.label}</span> : null;
 }
 
-function ImpactCard({ r, isAdmin, onDone, onError }) {
+function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
   const [busy, setBusy] = useState(false);
   const suggestions = r.affected.filter((a) => a.suggestion).length;
   const needPerson = r.affected.filter((a) => a.needsReview).length;
@@ -211,7 +263,10 @@ function ImpactCard({ r, isAdmin, onDone, onError }) {
             <tr key={a.id}>
               <td className="mono">{a.id}</td>
               <td>{a.question}</td>
-              <td>{a.expected}</td>
+              <td>
+                <EditableAnswer id={a.id} text={a.expected} onSave={isAdmin ? onEdit : null} />
+                {a.editedByAdmin && <span className="tag edited">rewritten</span>}
+              </td>
               <td><StatusTag status={a.status} />{a.reasons?.length > 0 && <div className="muted small">{a.reasons.join('; ')}</div>}</td>
               <td>
                 {a.suggestion ||
@@ -372,7 +427,17 @@ function QueueApp() {
     }
   };
 
-  if (error) return <p className="error">{error}</p>;
+  // Errors from the editor stay in the editor; this is only for whole-page failures.
+  const editAnswer = async (id, expected) => {
+    await invoke('editExpected', { id, expected });
+    await refresh();
+  };
+  const undoAnswer = async (id) => {
+    await invoke('editExpected', { id, undo: true });
+    await refresh();
+  };
+
+  if (error && !overview) return <p className="error">{error}</p>;
   if (!overview || !pairs) return <p className="muted">Loading…</p>;
   const s = pairs.summary;
 
@@ -382,6 +447,13 @@ function QueueApp() {
         <h1>Golden Set</h1>
         <p className="tagline">{TAGLINE}</p>
       </header>
+
+      {error && (
+        <div className="banner" role="alert">
+          <span>{error}</span>
+          <button className="link-button" onClick={() => setError('')}>Dismiss</button>
+        </div>
+      )}
 
       <Setup overview={overview} onSaved={refresh} />
 
@@ -425,7 +497,7 @@ function QueueApp() {
           {overview.isAdmin && <CheckNow pairs={pairs.selected} onDone={refresh} onError={setError} />}
           {impacts.length === 0 && <p className="muted">No article has changed since the golden set was built.</p>}
           {impacts.map((r) => (
-            <ImpactCard key={r.pageId} r={r} isAdmin={overview.isAdmin} onDone={refresh} onError={setError} />
+            <ImpactCard key={r.pageId} r={r} isAdmin={overview.isAdmin} onDone={refresh} onError={setError} onEdit={editAnswer} />
           ))}
         </section>
       )}
@@ -436,7 +508,7 @@ function QueueApp() {
             <h2>4. Golden pairs</h2>
             <button onClick={exportAll} disabled={!pairs.selected.length}>{articleFilter ? `Download CSV for ${articleFilter}` : 'Download CSV for Rovo Evaluations'}</button>
           </div>
-          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin && !busy ? mark(true) : null} article={articleFilter} onArticle={setArticleFilter} />
+          <PairTable pairs={pairs.selected} onToggle={overview.isAdmin && !busy ? mark(true) : null} onEdit={overview.isAdmin ? editAnswer : null} onUndo={overview.isAdmin ? undoAnswer : null} article={articleFilter} onArticle={setArticleFilter} />
         </section>
       )}
 

@@ -43,3 +43,8 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .status.info { background: #e9f2ff; color: #0055cc; }
 .bad-text { color: #ae2e24; }
 .warn-text { color: #a54800; }
+.tag.edited { color: #5e4db2; }
+.link-button { background: none; border: 0; padding: 2px 0; color: var(--accent); font-weight: 600; cursor: pointer; }
+.editor textarea { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; font: inherit; color: var(--text); resize: vertical; margin-bottom: 6px; }
+.banner { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; margin-bottom: 16px; border-radius: 6px; background: #ffeceb; color: var(--error); }
+.row.tight { gap: 12px; align-items: center; }

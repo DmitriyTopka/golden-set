@@ -12,7 +12,7 @@ import { listServiceDesks, statusCategories, closedRequestKeys, readRequests } f
 import { readArticles } from './confluence.js';
 import { seedNext, seedState, resetSeed } from './seed.js';
 import { registerProject, publishByline, readByline, saveBaselines, checkPage, checkProject, listImpacts, acceptEdit } from './impact.js';
-import { selectGoldenSet, reselect, toCsvChunks } from '../core/index.js';
+import { selectGoldenSet, reselect, toCsvChunks, cleanExpected, applyEdits, undoEdit } from '../core/index.js';
 import { permissions, canSeeSpace, visibleKeys, readableImpacts } from './access.js';
 
 const resolver = new Resolver();
@@ -38,7 +38,7 @@ const configOf = async (db) => (await db.get('config')) || null;
 
 /** Every key that holds pairs or anything derived from them. Cleared together when the space changes. */
 const PAIR_LISTS = ['pairs:selected', 'pairs:reserve', 'pairs:excluded'];
-const PAIR_KEYS = ['pairs:rejected', 'pairs:duplicates', 'result:summary', 'articles:versions', 'excluded'];
+const PAIR_KEYS = ['pairs:rejected', 'pairs:duplicates', 'result:summary', 'articles:versions', 'excluded', 'edits'];
 async function clearResults(db, projectKey) {
   const versions = (await db.get('articles:versions')) || {};
   await clearImpacts(db);
@@ -141,12 +141,13 @@ resolver.define('scanFinish', async ({ context }) => {
   const { db } = await guard(context, 'admin');
   const cfg = await configOf(db);
   const st = await db.get('scan:state');
-  const [requests, articles, excludedList] = await Promise.all([db.getList('raw'), readArticles(cfg.spaceId), db.get('excluded')]);
+  const [requests, articles, excludedList, edits] = await Promise.all([db.getList('raw'), readArticles(cfg.spaceId), db.get('excluded'), db.get('edits')]);
   const result = selectGoldenSet(requests, articles);
   const titles = Object.fromEntries(articles.map((a) => [a.pageId, a.title]));
   const withTitles = (p) => ({ ...p, articleTitle: p.link ? titles[p.link.pageId] : null });
   // "Not golden" marks survive a rescan: excluded pairs are parked, not lost, so they can be restored.
-  const next = reselect([...result.selected, ...result.reserve].map(withTitles), new Set(excludedList || []));
+  // Answers rewritten by an admin survive a rescan the same way.
+  const next = reselect(applyEdits([...result.selected, ...result.reserve].map(withTitles), edits), new Set(excludedList || []));
 
   await db.setList('pairs:selected', next.selected);
   await db.setList('pairs:reserve', next.reserve);
@@ -222,6 +223,42 @@ resolver.define('markNotGolden', async ({ payload, context }) => {
   const summary = await db.get('result:summary');
   if (summary) await db.set('result:summary', { ...summary, selected: next.selected.length, excludedByAdmin: next.excluded.length });
   return { selected: next.selected.length, excluded: next.excluded.length };
+});
+
+// An admin rewrites an expected answer, for example one marked "needs a person" after an article edit.
+resolver.define('editExpected', async ({ payload, context }) => {
+  const { db } = await guard(context, 'admin');
+  const id = String(payload?.id || '');
+  const lists = await Promise.all(PAIR_LISTS.map((k) => db.getList(k)));
+  const pair = lists.flat().find((p) => p.id === id);
+  if (!pair) throw new Error('This pair is not in the golden set any more.');
+  const edits = { ...((await db.get('edits')) || {}) };
+  let change;
+  let text;
+  if (payload?.undo) {
+    // Back to the answer from the resolved request.
+    delete edits[id];
+    change = undoEdit;
+    text = pair.edited?.from ?? pair.expected;
+  } else {
+    const clean = cleanExpected(payload?.expected);
+    if (!clean.ok) throw new Error(clean.error);
+    const edit = { expected: clean.text, at: new Date().toISOString() };
+    edits[id] = edit;
+    change = (p) => applyEdits([p], { [id]: edit })[0];
+    text = clean.text;
+  }
+  await db.set('edits', edits);
+  await Promise.all(PAIR_LISTS.map((k, i) => (lists[i].some((p) => p.id === id) ? db.setList(k, lists[i].map((p) => (p.id === id ? change(p) : p))) : null)));
+  // An open article edit shows this answer too: show the new text at once and drop its suggestion,
+  // so "Apply suggested answers" never overwrites what the admin wrote. The next check recomputes it.
+  for (const pageId of (await db.get('impacts')) || []) {
+    const record = await db.get(`impact:${pageId}`);
+    if (!record?.affected.some((a) => a.id === id)) continue;
+    record.affected = record.affected.map((a) => (a.id === id ? { ...a, expected: text, suggestion: null, needsReview: null, editedByAdmin: !payload?.undo } : a));
+    await db.set(`impact:${pageId}`, record);
+  }
+  return { id, expected: text };
 });
 
 resolver.define('getImpacts', async ({ context }) => {
