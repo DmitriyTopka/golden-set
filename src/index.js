@@ -47,6 +47,13 @@ async function guard(context, level) {
 
 const configOf = async (db) => (await db.get('config')) || null;
 
+/** Every key that holds pairs or anything derived from them. Cleared together when the space changes. */
+const PAIR_LISTS = ['pairs:selected', 'pairs:reserve', 'pairs:excluded'];
+const PAIR_KEYS = ['pairs:rejected', 'pairs:duplicates', 'result:summary', 'articles:versions', 'excluded'];
+async function clearResults(db) {
+  await Promise.all([...PAIR_LISTS.map((k) => db.clearList(k)), ...PAIR_KEYS.map((k) => db.del(k))]);
+}
+
 resolver.define('getOverview', async ({ context }) => {
   const { projectKey, perms, db } = await guard(context, 'browse');
   const [cfg, seed, scan, summary] = await Promise.all([configOf(db), seedState(db), db.get('scan:state'), db.get('result:summary')]);
@@ -80,7 +87,7 @@ resolver.define('saveConfig', async ({ payload, context }) => {
   const previous = await configOf(db);
   if (previous && previous.spaceId !== cfg.spaceId) {
     // Pairs quote articles of the old space; drop them so readers are never checked against the wrong space.
-    await Promise.all([db.clearList('pairs:selected'), db.clearList('pairs:reserve'), db.del('pairs:rejected'), db.del('pairs:duplicates'), db.del('result:summary'), db.del('articles:versions')]);
+    await clearResults(db);
   }
   await db.set('config', cfg);
   return cfg;
