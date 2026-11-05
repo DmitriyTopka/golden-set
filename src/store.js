@@ -3,6 +3,10 @@ import { kvs, WhereConditions } from './forge.js';
 
 const CHUNK = 40;
 
+/** Per-project key: page id -> article version the scheduled check last processed in full. */
+export const CHECKED = 'checked';
+const INPUTS = ['pairs', 'snap', 'config', 'edits', 'excluded'];
+
 export const get = (key) => kvs.get(key);
 export const set = (key, value) => kvs.set(key, value);
 export const del = (key) => kvs.delete(key);
@@ -53,14 +57,19 @@ export async function valuesByPrefix(prefix) {
  */
 export function forProject(projectKey) {
   const p = (k) => `p:${projectKey}:${k}`;
+  // The scheduled check skips pages it already processed at their current version. Anything that can
+  // change its result (pairs, baselines, settings, rewritten answers) drops that memory first.
+  const touch = async (k) => {
+    if (k !== CHECKED && INPUTS.some((x) => k === x || k.startsWith(`${x}:`))) await del(p(CHECKED));
+  };
   return {
     get: (k) => get(p(k)),
-    set: (k, v) => set(p(k), v),
-    del: (k) => del(p(k)),
-    setList: (k, items) => setList(p(k), items),
+    set: async (k, v) => { await touch(k); return set(p(k), v); },
+    del: async (k) => { await touch(k); return del(p(k)); },
+    setList: async (k, items) => { await touch(k); return setList(p(k), items); },
     getList: (k) => getList(p(k)),
-    appendChunk: (k, i, items) => appendChunk(p(k), i, items),
-    clearList: (k) => clearList(p(k)),
+    appendChunk: async (k, i, items) => { await touch(k); return appendChunk(p(k), i, items); },
+    clearList: async (k) => { await touch(k); return clearList(p(k)); },
     valuesByPrefix: (k) => valuesByPrefix(p(k)),
   };
 }

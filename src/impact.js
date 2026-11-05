@@ -5,7 +5,7 @@
 // expected answers were written for. The baseline moves forward only when an admin accepts the edit.
 import { route, kvs } from './forge.js';
 import { call } from './http.js';
-import { forProject } from './store.js';
+import { forProject, CHECKED } from './store.js';
 import { diffArticle, computeImpact, suggestAnswer, applyEdits } from '../core/index.js';
 import { stripMarkup } from '../core/text.js';
 
@@ -86,10 +86,14 @@ async function currentPage(pageId, spaceId) {
  * Compares the article with its baseline and stores the impact for the project.
  * @returns {{ record: object|null, reason: 'changed'|'no_change'|'no_pairs'|'no_baseline'|'page_not_found' }}
  */
-export async function checkPage(projectKey, pageId) {
+export async function checkPage(projectKey, pageId, loaded = {}) {
   const db = forProject(projectKey);
   const id = String(pageId);
-  const [baseline, selected, cfg] = await Promise.all([db.get(`snap:${id}`), db.getList('pairs:selected'), db.get('config')]);
+  const [baseline, selected, cfg] = await Promise.all([
+    db.get(`snap:${id}`),
+    loaded.selected || db.getList('pairs:selected'),
+    'cfg' in loaded ? loaded.cfg : db.get('config'),
+  ]);
   const pairs = selected.filter((p) => p.link?.pageId === id);
   if (!baseline) return { record: null, reason: 'no_baseline' };
   if (pairs.length === 0) return { record: null, reason: 'no_pairs' };
@@ -101,11 +105,12 @@ export async function checkPage(projectKey, pageId) {
 
   if (!diff.changed) {
     // Back to the baseline, or accepted while this check was running: no open edit for this page.
+    let settled = true;
     if (previous) {
       await db.del(`impact:${id}`);
-      await publishByline(id, projectKey, { total: pairs.length, outdated: 0 }).catch(() => null);
+      settled = await publishByline(id, projectKey, { total: pairs.length, outdated: 0 }).then(() => true).catch(() => false);
     }
-    return { record: null, reason: 'no_change' };
+    return { record: null, reason: 'no_change', version: current.version, settled };
   }
 
   const impact = computeImpact(pairs, diff);
@@ -134,7 +139,7 @@ export async function checkPage(projectKey, pageId) {
     if (ok) record.bylineFor = `${record.toVersion}:${record.counts.outdated}`;
   } else record.bylineFor = previous.bylineFor;
   await db.set(`impact:${id}`, record);
-  return { record, reason: 'changed' };
+  return { record, reason: 'changed', version: current.version, settled: Boolean(record.bylineFor) };
 }
 
 export async function listImpacts(db) {
@@ -176,12 +181,23 @@ export async function acceptEdit(projectKey, pageId, { applySuggestions }) {
   }
   if (current) await db.set(`snap:${id}`, current);
   await db.del(`impact:${id}`);
+  await db.del(CHECKED);
   const total = (await db.getList('pairs:selected')).filter((p) => p.link?.pageId === id).length;
   await publishByline(id, projectKey, { total, outdated: 0 }).catch(() => null);
   return { accepted: id, applied };
 }
 
-/** Checks every page the project relies on. Cheap when nothing changed: one version read per page. */
+async function pageVersion(pageId) {
+  // Without a body: the article text is fetched only when the version moved.
+  const p = await call('app', 'confluence', route`/wiki/api/v2/pages/${pageId}`, { allow404: true });
+  return p?.version?.number ?? null;
+}
+
+/**
+ * Checks every page the project relies on. Cheap when nothing changed: three small storage reads
+ * per project and one version read per page. The pairs and baselines (the large values) are read
+ * only when an article version differs from the one this check last processed in full.
+ */
 export async function checkProject(projectKey) {
   const db = forProject(projectKey);
   let pages = await db.get('pages:used');
@@ -190,13 +206,43 @@ export async function checkProject(projectKey) {
     pages = [...new Set((await db.getList('pairs:selected')).map((p) => p.link?.pageId).filter(Boolean))];
     await registerProject(projectKey, pages);
   }
+  // A rescan or an edit during this run deletes the memory; the marker written here lets the end of
+  // the run see that and not save results computed from the old pairs.
+  let checked = await db.get(CHECKED);
+  if (!checked) {
+    checked = {};
+    await db.set(CHECKED, checked);
+  }
+  const next = { ...checked };
   const results = [];
+  let loaded = null;
   for (const id of pages) {
     try {
-      results.push({ pageId: id, ...(await checkPage(projectKey, id)) });
+      const version = await pageVersion(id);
+      if (id in checked && checked[id] === version) {
+        results.push({ pageId: id, record: null, reason: 'unchanged' });
+        continue;
+      }
+      if (!loaded) {
+        const [selected, cfg] = await Promise.all([db.getList('pairs:selected'), db.get('config')]);
+        loaded = { selected, cfg };
+      }
+      const res = await checkPage(projectKey, id, loaded);
+      results.push({ pageId: id, ...res });
+      // Remember only a finished result: a failed byline write is tried again. A missing page, baseline
+      // or pairs stays as it is until the version moves or a rescan clears this memory.
+      const stable = ['no_baseline', 'no_pairs', 'page_not_found'].includes(res.reason);
+      if (stable || (res.settled && res.version === version)) next[id] = version;
+      else delete next[id];
     } catch (e) {
+      delete next[id];
       results.push({ pageId: id, record: null, reason: `error: ${e.message}` });
     }
+  }
+  for (const id of Object.keys(next)) if (!pages.includes(id)) delete next[id];
+  if (JSON.stringify(next) !== JSON.stringify(checked)) {
+    const now = await db.get(CHECKED);
+    if (now && JSON.stringify(now) === JSON.stringify(checked)) await db.set(CHECKED, next);
   }
   return results;
 }
