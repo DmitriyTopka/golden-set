@@ -4,3 +4,4 @@ coverage/
 .env
 out/
 static/ui/dist/
+video/
