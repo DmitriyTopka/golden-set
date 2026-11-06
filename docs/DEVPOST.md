@@ -35,6 +35,10 @@ Golden Set is a Forge app for Jira Service Management and Confluence, with a Rov
 6. **Answers in Rovo chat.** The Golden Set agent answers "Which golden answers did the last article edit break?", shows the golden answers for an article, and hands over the re-test CSV.
 7. **Lets admins stay in charge.** Admins can mark a pair "not golden", restore it, rewrite an expected answer, undo the rewrite, and accept an edit with or without the suggestions. Rewrites survive a rescan.
 
+## How it differs from drift checkers
+
+Several Codegeist entries compare a Confluence page with Jira work and flag when the two drift apart. Golden Set looks at a different pair: the article and the answers your customers already received. Its unit is a resolved request with a verified answer, and its output is a test set you can run in Rovo Evaluations. On our demo the prediction came before the test run: Golden Set flagged 8 of the 12 answers that rely on Returns policy, and Evaluations then failed exactly those 8 (92% before the edit, 33% after).
+
 ## How we built it
 
 - **Forge** with a JSM queue page (Custom UI, React), a Confluence byline item, a scheduled trigger, a Rovo agent with three read-only actions, an MCP server (rovo:mcp) that exposes the same actions as tools, and Forge KVS storage.

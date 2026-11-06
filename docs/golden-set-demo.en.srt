@@ -1,0 +1,148 @@
+1
+00:00:00,300 --> 00:00:02,132
+One small edit to a help article.
+
+2
+00:00:02,182 --> 00:00:03,785
+Thirty days becomes fourteen.
+
+3
+00:00:03,835 --> 00:00:06,180
+Your support agent answers from this page.
+
+4
+00:00:10,300 --> 00:00:15,030
+Golden Set shows, right on the page, which tested support answers this edit just made wrong.
+
+5
+00:00:16,800 --> 00:00:17,365
+Golden Set.
+
+6
+00:00:17,415 --> 00:00:20,773
+See which support answers break when you edit a help article.
+
+7
+00:00:21,800 --> 00:00:26,901
+Golden Set keeps verified questions and answers from your resolved requests.
+
+8
+00:00:26,951 --> 00:00:29,340
+Twelve of them rely on this article.
+
+9
+00:00:29,390 --> 00:00:31,441
+Eight now state the old window.
+
+10
+00:00:31,491 --> 00:00:35,101
+For each one Golden Set suggests the corrected answer.
+
+11
+00:00:35,151 --> 00:00:40,658
+This one it refuses to guess: the customer said the watch arrived three weeks ago.
+
+12
+00:00:40,708 --> 00:00:43,573
+With thirty days that customer was in time.
+
+13
+00:00:43,623 --> 00:00:45,470
+With fourteen, they are not.
+
+14
+00:00:45,520 --> 00:00:50,824
+Swapping thirty for fourteen would read fine and be wrong, so a person decides.
+
+15
+00:00:52,300 --> 00:00:55,080
+Rewrite it, apply the rest, accept the edit.
+
+16
+00:00:55,130 --> 00:00:58,232
+Now the saved answers agree with the new article.
+
+17
+00:01:04,300 --> 00:01:06,243
+But was the prediction right?
+
+18
+00:01:06,293 --> 00:01:10,298
+We ran Rovo Agent Evaluations on the same twelve questions.
+
+19
+00:01:10,348 --> 00:01:12,223
+Before the edit: 92 percent.
+
+20
+00:01:12,273 --> 00:01:13,529
+After the edit: 33.
+
+21
+00:01:13,579 --> 00:01:20,058
+The eight failures are exactly the eight answers Golden Set flagged, before any evaluation ran.
+
+22
+00:01:20,108 --> 00:01:22,464
+After applying the suggestions: 83.
+
+23
+00:01:22,514 --> 00:01:28,100
+The two misses are the three weeks case, and a question the article never covered.
+
+24
+00:01:29,300 --> 00:01:34,300
+The Golden Set agent answers in Rovo chat, and hands you the re-test file for Evaluations.
+
+25
+00:01:34,350 --> 00:01:37,217
+It never shows anything you could not open yourself.
+
+26
+00:01:41,300 --> 00:01:43,916
+Where do the golden answers come from?
+
+27
+00:01:43,966 --> 00:01:46,160
+From your own resolved requests.
+
+28
+00:01:46,210 --> 00:01:49,176
+Golden Set keeps the ones that were solved:
+
+29
+00:01:49,226 --> 00:01:52,123
+not reopened, no complaint, no low rating.
+
+30
+00:01:52,173 --> 00:01:56,401
+It strips personal data and ties every answer to its article.
+
+31
+00:01:56,451 --> 00:01:57,734
+Eighty requests in:
+
+32
+00:01:57,784 --> 00:02:02,644
+fifteen rejected, five duplicates, ten in reserve, fifty golden pairs.
+
+33
+00:02:03,800 --> 00:02:09,422
+It compares the facts in each answer, numbers, money and durations, with the old and the new article.
+
+34
+00:02:09,472 --> 00:02:14,869
+No language model of our own runs here, so it costs nothing and gives the same result every time.
+
+35
+00:02:14,919 --> 00:02:18,744
+It works without Rovo, and every view runs with your own permissions.
+
+36
+00:02:19,800 --> 00:02:21,776
+Evaluations give you a test runner.
+
+37
+00:02:21,826 --> 00:02:26,463
+Golden Set gives you the test set, and tells you which tests each edit can break.
+
