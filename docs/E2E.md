@@ -65,3 +65,16 @@ checks access to the knowledge base space and per-page restrictions. Both now us
 
 - How many Rovo credits the three evaluation runs used. Studio does not show it on the evaluation page.
 - The app with the rovo:agent module on the second site (gs-judge-test). Gate item 8 still open.
+
+## MCP check (06.11.2026)
+
+Site one-atlas-kzrl, development installation 2.26.0. Atlassian Administration > Connected apps > golden-set-app > Tools: "Expose tools to MCP-compatible apps" switched to Enabled. MCP Inspector 2.14.0 connected to https://mcp.atlassian.com/forge/c4b582c2-566a-4180-9837-2917cd0f3d87 (Streamable HTTP, protocol 2025-03-26) after the Atlassian OAuth consent.
+
+| Call | Result |
+|---|---|
+| tools/list | 3 tools: list-article-impacts, get-article-pairs, get-retest-csv (suffix _development), all read-only |
+| list-article-impacts | "No help article has changed since the golden set was built" (the article was at 30 days) |
+| get-article-pairs, Returns policy | 12 golden pairs, project NS, 0 email addresses |
+| get-retest-csv, Returns policy | 12 rows, prompt and expected_response columns |
+
+Without a token the endpoint answers 401 with a pointer to the OAuth metadata.
