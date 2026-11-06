@@ -43,6 +43,13 @@ modules:
         - list-article-impacts
         - get-article-pairs
         - get-retest-csv
+  rovo:mcp:
+    - key: golden-set-mcp
+      name: Golden Set
+      tools:
+        - list-article-impacts
+        - get-article-pairs
+        - get-retest-csv
   action:
     - key: list-article-impacts
       name: List article edits that affect golden answers

@@ -37,6 +37,7 @@ If the page says "Installation failed" in Jira, wait a minute and try again. We 
 ### With Rovo (optional)
 
 - Open Rovo chat, pick the **Golden Set** agent and ask: "Which golden answers did the last article edit break?", "Show the golden answers for Returns policy" or "Give me the re-test CSV for Returns policy". The agent only reads; it shows what you could see yourself in Jira.
+- Golden Set is also an MCP server. In Rovo Studio, create or open a custom agent, add tools and pick the **Golden Set** MCP server: you get the same three read-only tools (list-article-impacts, get-article-pairs, get-retest-csv). To use them from an outside MCP client, a site admin first turns on external MCP exposure for Golden Set in Atlassian Administration (Apps > Sites > your site > Connected apps); the endpoint is https://mcp.atlassian.com/forge/c4b582c2-566a-4180-9837-2917cd0f3d87.
 - In Rovo Studio, open your support agent, **Evaluation > Create dataset**, upload the CSV and run **Response accuracy**. In our run the same 12 questions scored 92% before the edit and 33% after it: the 8 failures were the 8 answers Golden Set had flagged. After we applied the suggestions the score went back up to 83%.
 
 ## Demo data

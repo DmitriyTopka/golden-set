@@ -13,7 +13,7 @@ See which support answers break when you edit a help article.
 ## Category and bonus
 
 - Category: Apps for Business Teams (support teams). Decided by Dima on 04.11.
-- Bonus prize: Best Agents - Rovo/Assignable agents (rovo:agent module with three rovo:action modules).
+- Bonus prizes: Best Agents - Rovo/Assignable agents (rovo:agent module with three rovo:action modules) and Best app with Atlassian MCP (rovo:mcp module exposing the same three actions as tools). Decided by Dima on 06.11. One submission can win at most one bonus prize.
 
 ## Inspiration
 
@@ -37,7 +37,7 @@ Golden Set is a Forge app for Jira Service Management and Confluence, with a Rov
 
 ## How we built it
 
-- **Forge** with a JSM queue page (Custom UI, React), a Confluence byline item, a scheduled trigger, a Rovo agent with three read-only actions, and Forge KVS storage.
+- **Forge** with a JSM queue page (Custom UI, React), a Confluence byline item, a scheduled trigger, a Rovo agent with three read-only actions, an MCP server (rovo:mcp) that exposes the same actions as tools, and Forge KVS storage.
 - **One installation for Jira and Confluence** (app compatibility: Jira required, Confluence optional), so data, permissions and the Rovo agent are shared and Rovo lists one Golden Set agent.
 - **A deterministic core with no LLM of its own**: personal data redaction (emails, phones, cards with a Luhn check, IBAN, names from the request), answer cleanup, fact extraction (numbers, money, percentages, durations), linking, scoring, deduplication, article diff and suggestions. Same input, same result, zero inference cost. 126 unit tests, including a "dirty" set of realistic requests.
 - **Permissions checked as the asking user** everywhere: Browse projects and access to the knowledge base space to read, Administer projects to change anything, per-request visibility (issue security) and per-page restrictions in Confluence. The page and the Rovo actions use the same gate.
@@ -70,11 +70,15 @@ Golden Set is a Forge app for Jira Service Management and Confluence, with a Rov
 
 ## How it meets the technology requirement
 
-Golden Set is a Forge app (manifest, Forge runtime, Forge KVS, scheduled trigger, Custom UI) that integrates with Jira Service Management (resolved requests, comments, satisfaction ratings, permissions), Confluence (articles, versions, page properties, byline item) and Rovo (rovo:agent with three rovo:action modules), and its output is built for Rovo Agent Evaluations.
+Golden Set is a Forge app (manifest, Forge runtime, Forge KVS, scheduled trigger, Custom UI) that integrates with Jira Service Management (resolved requests, comments, satisfaction ratings, permissions), Confluence (articles, versions, page properties, byline item) and Rovo (rovo:agent with three rovo:action modules, and a rovo:mcp server with the same three tools), and its output is built for Rovo Agent Evaluations.
 
 ## Bonus prize write-up: Best Agents
 
 The Golden Set agent is a Forge rovo:agent with three read-only rovo:action modules: list-article-impacts, get-article-pairs and get-retest-csv. Ask it "Which golden answers did the last article edit break?" and it names the article, the change ("30 days -> 14 days") and the answers that are likely outdated, with a suggested new answer for each. Ask for the re-test CSV and it returns a dataset ready for Rovo Evaluations. Each action runs as the asking user and answers only with requests, pages and spaces that user could open in Jira and Confluence.
+
+## Bonus prize write-up: Best app with Atlassian MCP
+
+Golden Set ships a rovo:mcp module named Golden Set. It exposes the three read-only actions as MCP tools: list-article-impacts, get-article-pairs and get-retest-csv. Any custom agent you build in Rovo Studio can add them, so the support agent that answers customers can also check which of its own tested answers an article edit just broke, and pull the re-test CSV before an Evaluations run. Once a site admin turns on external MCP exposure for the app, the same tools work in an outside client through https://mcp.atlassian.com/forge/c4b582c2-566a-4180-9837-2917cd0f3d87. Every tool call runs with the caller's own permissions: it shows only requests, pages and spaces that person could open in Jira and Confluence. No tool writes anything.
 
 ## Testing instructions
 
