@@ -10,6 +10,14 @@ Demo video (2:27): https://youtu.be/FUgnW8DuiIU
 
 Built for Atlassian Codegeist 2026.
 
+**The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on the Returns policy article. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 83% after the suggested fixes. Demo data is synthetic (Northwind Gear, a fictional shop).
+
+![Returns policy changed from 30 to 14 days: 12 golden answers depend on it, 8 are likely outdated](docs/devpost-gallery/01-article-edit-detected.jpg)
+
+![A suggested answer for each outdated pair; the smartwatch answer goes to a person](docs/devpost-gallery/03-suggestions-and-needs-a-person.jpg)
+
+![Rovo Evaluations on the same 12 questions: 92%, 33%, 83%](docs/devpost-gallery/07-evals-92-33-83.jpg)
+
 ## What you get
 
 - **A queue page in your service project** (Queues > Golden Set): pick the knowledge base space, scan resolved requests, review the golden pairs, see article edits with suggested answers, accept or reject them, download re-test CSVs.
