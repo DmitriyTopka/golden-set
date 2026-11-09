@@ -49,3 +49,4 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .banner { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; margin-bottom: 16px; border-radius: 6px; background: #ffeceb; color: var(--error); }
 .row.tight { gap: 12px; align-items: center; }
 .hint { margin: 12px 0 0; padding: 8px 12px; border-radius: 6px; background: #e9f2ff; color: #0055cc; }
+.demo-edit { align-items: center; background: #f4f5f7; border-radius: 6px; padding: 10px 12px; margin: 8px 0 12px; }

@@ -346,6 +346,33 @@ function CheckNow({ pairs, onDone, onError }) {
   );
 }
 
+/** One click for the demo: edit the demo Returns policy article in Confluence (30 -> 14 days) and back. */
+function DemoEdit({ open, onDone, onError }) {
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState('');
+  const run = async () => {
+    setBusy(true);
+    setNote('');
+    try {
+      const r = await invoke('demoEdit', { undo: open });
+      if (r?.reason === 'changed_by_hand') setNote('The demo article was changed by hand, so the demo edit was not applied.');
+      if (r?.reason === 'already') setNote(open ? 'Returns policy already says 30 days.' : 'Returns policy already says 14 days and that edit was accepted.');
+      await onDone();
+    } catch (e) {
+      onError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="row demo-edit">
+      <span>{open ? 'Demo: Returns policy now says 14 days.' : 'Try it on the demo data: change Returns policy in Confluence from 30 to 14 days.'}</span>
+      <button onClick={run} disabled={busy}>{busy ? 'Working…' : open ? 'Put it back to 30 days' : 'Make the demo edit'}</button>
+      {note && <span className="muted">{note}</span>}
+    </div>
+  );
+}
+
 function BylineView() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -515,6 +542,9 @@ function QueueApp() {
         <section className="card">
           <h2>3. Article changes</h2>
           <p className="muted">Golden Set checks the articles every five minutes and each time this page opens. You can also check one now.</p>
+          {overview.isAdmin && overview.seed?.pages?.['100001'] && (
+            <DemoEdit pageId={overview.seed.pages['100001']} open={impacts.some((r) => r.pageId === String(overview.seed.pages['100001']))} onDone={refresh} onError={setError} />
+          )}
           {overview.isAdmin && <CheckNow pairs={pairs.selected} onDone={refresh} onError={setError} />}
           {impacts.length === 0 && <p className="muted">No article has changed since the golden set was built.</p>}
           {impacts.map((r) => (

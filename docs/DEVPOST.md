@@ -92,7 +92,7 @@ Quick path (about 3 minutes of clicks plus about a minute and a half of waiting 
 
 1. Install from the link above into Jira, and make sure Confluence is connected to the same installation.
 2. In a test service project open Queues > Golden Set, pick a Confluence space, press Save, then Load demo data (Northwind Gear). It runs by itself for about 75 seconds. Then press Scan resolved requests: 80 read, 15 rejected, 5 duplicates, 50 golden pairs.
-3. In Confluence change "within 30 days of delivery" to "within 14 days of delivery" on Returns policy and publish. Reload Golden Set: 12 golden answers depend on this page, 8 likely outdated, and the smartwatch answer is marked Needs a person.
+3. In section 3 press **Make the demo edit**: Golden Set changes "within 30 days of delivery" to "within 14 days of delivery" in the Returns policy article and checks it at once (you can also edit the article in Confluence by hand and reload). You see: 12 golden answers depend on this page, 8 likely outdated, and the smartwatch answer is marked Needs a person.
 
 Full guide: docs/JUDGES.md in the repository: install, one-click demo data, a 10 minute walkthrough with the numbers you should see, and why each permission is needed.
 

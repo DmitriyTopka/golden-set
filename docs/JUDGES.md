@@ -28,7 +28,7 @@ If the page says "Installation failed" in Jira, wait a minute and try again. We 
 3. **2. Build the golden set.** Press **Load demo data (Northwind Gear)**. It takes about 75 seconds; you can watch the counter. Then press **Scan resolved requests**.
    You should see: 80 resolved requests read, 15 rejected (reasons listed below the pairs), 5 duplicates folded, 50 golden pairs across 7 articles.
 4. Look at **4. Golden pairs**. Each answer comes from a resolved request. Golden Set replaces personal data with [email], [phone] and so on, and shows the article each pair relies on. Try the **Help article** filter, **Not golden**, and **Edit** on an answer.
-5. Open the Confluence page **Returns policy** in your space. Change "within 30 days of delivery" to "within 14 days of delivery" and publish.
+5. In **3. Article changes** press **Make the demo edit**. Golden Set changes "within 30 days of delivery" to "within 14 days of delivery" in the demo article **Returns policy** and checks it at once. Or do it by hand: open the page in Confluence, change the sentence and publish. **Put it back to 30 days** undoes the demo edit.
 6. Back in Golden Set, reload the page (or pick the article and press **Check now**). Section **3. Article changes** says that 12 golden answers depend on this page and 8 are likely outdated, shows the change "30 days -> 14 days" and a suggested new answer for each.
    One answer (the smartwatch that "arrived about three weeks ago") gets no suggestion and is marked **Needs a person**: changing only the number would flip its verdict. Rewrite it with **Edit**.
 7. Press **Apply suggested answers and accept edit**, or **Download re-test CSV** first.

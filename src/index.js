@@ -297,6 +297,34 @@ resolver.define('checkNow', async ({ payload, context }) => {
   return { reason: res.reason };
 });
 
+// Demo shortcut for judges: makes (or undoes) the 30 -> 14 days edit in the demo Returns policy article,
+// as the clicking user, then checks the page at once. Only for the article the demo data created.
+const DEMO_FROM = 'within 30 days of delivery';
+const DEMO_TO = 'within 14 days of delivery';
+resolver.define('demoEdit', async ({ payload, context }) => {
+  const { projectKey, db } = await guard(context, 'admin');
+  const st = await seedState(db);
+  const pageId = st?.pages?.['100001'];
+  if (!pageId) return { reason: 'no_demo' };
+  const page = await call('user', 'confluence', route`/wiki/api/v2/pages/${pageId}?body-format=storage`);
+  const body = page?.body?.storage?.value || '';
+  const [from, to] = payload?.undo ? [DEMO_TO, DEMO_FROM] : [DEMO_FROM, DEMO_TO];
+  if (!body.includes(from)) return { reason: body.includes(to) ? 'already' : 'changed_by_hand', pageId };
+  await call('user', 'confluence', route`/wiki/api/v2/pages/${pageId}`, {
+    method: 'PUT',
+    body: {
+      id: String(pageId),
+      status: 'current',
+      title: page.title,
+      body: { representation: 'storage', value: body.split(from).join(to) },
+      version: { number: (page.version?.number || 1) + 1, message: payload?.undo ? 'Golden Set demo: back to 30 days' : 'Golden Set demo: 30 -> 14 days' },
+    },
+  });
+  const res = await checkPage(projectKey, pageId);
+  console.log(`demoEdit ${projectKey} page ${pageId} undo=${Boolean(payload?.undo)}: ${res.reason}`);
+  return { reason: res.reason, pageId };
+});
+
 // Opening the page checks for article edits at once, so nobody waits for the five-minute schedule.
 resolver.define('refreshImpacts', async ({ context }) => {
   const { projectKey } = await guard(context, 'admin');
