@@ -50,3 +50,7 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .row.tight { gap: 12px; align-items: center; }
 .hint { margin: 12px 0 0; padding: 8px 12px; border-radius: 6px; background: #e9f2ff; color: #0055cc; }
 .demo-edit { align-items: center; background: #f4f5f7; border-radius: 6px; padding: 10px 12px; margin: 8px 0 12px; }
+.status-line { margin: 8px 0 0; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+.status-line.ok { background: #e3fcef; color: #064; }
+.status-line.bad { background: #ffebe6; color: #ae2a19; }
+.status[title] { cursor: help; }

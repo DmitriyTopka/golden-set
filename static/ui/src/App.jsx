@@ -206,15 +206,15 @@ function PairTable({ pairs, onToggle, onEdit, onUndo, actionLabel = 'Not golden'
 }
 
 const STATUS = {
-  likely_outdated: { label: 'Likely outdated', cls: 'bad' },
-  recheck: { label: 'Re-check', cls: 'warn' },
-  facts_not_detected_recheck_all: { label: 'Re-check (no fact detected)', cls: 'warn' },
-  new_text_only: { label: 'New text added', cls: 'info' },
+  likely_outdated: { label: 'Likely outdated', cls: 'bad', hint: 'The answer states a fact the edit changed.' },
+  recheck: { label: 'Re-check', cls: 'warn', hint: 'The answer relies on the edited article, but none of its facts changed. Keep it in the re-test.' },
+  facts_not_detected_recheck_all: { label: 'Re-check (no fact detected)', cls: 'warn', hint: 'The edit changed wording, not numbers, so every answer on this page goes into the re-test.' },
+  new_text_only: { label: 'New text added', cls: 'info', hint: 'The article only gained text; existing answers still hold.' },
 };
 
 function StatusTag({ status }) {
   const s = STATUS[status];
-  return s ? <span className={`status ${s.cls}`}>{s.label}</span> : null;
+  return s ? <span className={`status ${s.cls}`} title={s.hint}>{s.label}</span> : null;
 }
 
 function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
@@ -277,7 +277,7 @@ function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
                   (a.needsReview ? (
                     <span className="warn-text">Needs a person: this answer decides from how long ago the customer got the item, so changing the number alone could flip it.</span>
                   ) : (
-                    <span className="muted">-</span>
+                    <span className="muted">{a.status === 'likely_outdated' ? '-' : 'No fact changed. Keep it in the re-test.'}</span>
                   ))}
               </td>
             </tr>
@@ -343,6 +343,19 @@ function CheckNow({ pairs, onDone, onError }) {
       <button disabled={!pageId || busy} onClick={run}>{busy ? 'Checking…' : 'Check now'}</button>
       {note && <span className="muted">{note}</span>}
     </div>
+  );
+}
+
+/** One line that says where things stand before the admin reads the sections. */
+function StatusLine({ s, impacts }) {
+  const atRisk = impacts.reduce((n, r) => n + (r.counts?.outdated || 0), 0);
+  return (
+    <p className={`status-line ${atRisk ? 'bad' : 'ok'}`}>
+      <b>{s.selected}</b> golden answers from <b>{s.requests}</b> resolved requests ·{' '}
+      {impacts.length === 0
+        ? 'all of them match their help articles'
+        : <><b>{impacts.length}</b> {impacts.length === 1 ? 'article was' : 'articles were'} edited · <b>{atRisk}</b> {atRisk === 1 ? 'answer is' : 'answers are'} likely outdated</>}
+    </p>
   );
 }
 
@@ -482,6 +495,7 @@ function QueueApp() {
       <header>
         <h1>Golden Set</h1>
         <p className="tagline">{TAGLINE}</p>
+        {s && <StatusLine s={s} impacts={impacts} />}
       </header>
 
       {error && (
