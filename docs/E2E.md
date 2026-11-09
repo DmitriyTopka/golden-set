@@ -78,3 +78,9 @@ Site one-atlas-kzrl, development installation 2.26.0. Atlassian Administration >
 | get-retest-csv, Returns policy | 12 rows, prompt and expected_response columns |
 
 Without a token the endpoint answers 401 with a pointer to the OAuth metadata.
+
+## Demo data load time (09.11.2026)
+
+Requests are now created four at a time. On a fresh service project made from the IT service management template, Load demo data finished in 65 to 75 seconds (it took about 6 minutes before). Scan after it: 80 resolved requests read, 15 rejected, 5 duplicates folded, 50 golden pairs across 7 articles, the same numbers as before. All 80 requests ended in the resolved status.
+
+The same run found a bug the old code shared: that template offers "Cancel request" next to "Resolve this issue", and the loader picked the first done transition, so every request ended Canceled and the reopened examples could not be reopened. The loader now prefers a resolving transition and never picks cancel or decline while another one leads to done.

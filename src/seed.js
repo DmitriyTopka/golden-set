@@ -11,7 +11,10 @@ import { call } from './http.js';
 import { ARTICLES, GOLDEN, NO_LINK, BAD, DUPLICATE_OF } from '../seed/data.mjs';
 
 const STATE = 'seed:state';
-const PER_STEP = 4;
+// Requests are created a few at a time in parallel, and a step keeps starting new rounds while it
+// has time left, so the whole demo loads in about a minute and a half instead of six.
+const PARALLEL = 4;
+const STEP_BUDGET_MS = 10000;
 const GREETINGS = ['Hi {first},', 'Hello {first},', 'Hi {first}, thanks for reaching out.', 'Hey {first},'];
 const SIGNOFFS = ['Best regards,\n{agent}', 'Kind regards,\n{agent}', 'Cheers,\n{agent}', 'Thanks,\n{agent}'];
 
@@ -112,12 +115,27 @@ async function createPages(st, db) {
 
 // Workflows differ: some go straight to Done, others need "In progress" first. Walk up to 4 steps,
 // preferring a transition that lands where we want and never revisiting a status.
+// Workflows differ by template. The IT service template offers "Canceled" and "Declined" next to
+// "Resolved", and a canceled request cannot be reopened, so a done transition named like a refusal
+// is used only when nothing else leads to done.
+const REFUSAL = /cancel|declin|reject|won.?t|отмен|отклон|скасов|відхил/i;
+const RESOLVED = /resolv|done|complet|fix|реш|выполн|готов|виріш|викон/i;
+
+export function pickTransition(all, wantDone) {
+  const fits = all.filter((x) => (x.to?.statusCategory?.key === 'done') === wantDone);
+  if (!wantDone) return fits[0];
+  const label = (x) => `${x.name || ''} ${x.to?.name || ''}`;
+  return fits.find((x) => RESOLVED.test(label(x)) && !REFUSAL.test(label(x)))
+    || fits.find((x) => !REFUSAL.test(label(x)))
+    || fits[0];
+}
+
 async function transitionTo(key, wantDone) {
   const seen = new Set();
   for (let hop = 0; hop < 4; hop += 1) {
     const res = await call('user', 'jira', route`/rest/api/3/issue/${key}/transitions?expand=transitions.fields`);
     const all = res?.transitions || [];
-    const target = all.find((x) => (x.to?.statusCategory?.key === 'done') === wantDone);
+    const target = pickTransition(all, wantDone);
     const step = target || all.find((x) => x.to?.statusCategory?.key === 'indeterminate' && !seen.has(x.to?.id));
     if (!step) throw new Error(`${key}: no transition to ${wantDone ? 'done' : 'open'}`);
     seen.add(step.to?.id);
@@ -140,27 +158,28 @@ function replyText(spec, customer, agentName, pageUrl, n) {
   return lines.join('\n');
 }
 
-// Resumable: progress for the request in flight is kept in st.current, so a failed step is retried
-// without raising the same request twice.
+// Resumable: progress for each request in flight is kept in st.inflight[index], so a failed step is
+// retried without raising the same request twice.
 async function createRequest(spec, n, st, siteUrl, agentName, db) {
   const customer = st.customers[n % st.customers.length];
-  if (st.current?.index === n) return finishRequest(spec, n, st, customer, siteUrl, agentName, db);
-  const created = await call('user', 'jira', route`/rest/servicedeskapi/request`, {
-    method: 'POST',
-    body: {
-      serviceDeskId: st.serviceDeskId,
-      requestTypeId: st.requestTypeId,
-      raiseOnBehalfOf: customer.id,
-      requestFieldValues: { summary: spec.summary, description: spec.detail },
-    },
-  });
-  st.current = { index: n, key: created.issueKey, step: 'comment' };
-  await db.set(STATE, st);
+  if (!st.inflight[n]) {
+    const created = await call('user', 'jira', route`/rest/servicedeskapi/request`, {
+      method: 'POST',
+      body: {
+        serviceDeskId: st.serviceDeskId,
+        requestTypeId: st.requestTypeId,
+        raiseOnBehalfOf: customer.id,
+        requestFieldValues: { summary: spec.summary, description: spec.detail },
+      },
+    });
+    st.inflight[n] = { key: created.issueKey, step: 'comment' };
+    await db.set(STATE, st);
+  }
   return finishRequest(spec, n, st, customer, siteUrl, agentName, db);
 }
 
 async function finishRequest(spec, n, st, customer, siteUrl, agentName, db) {
-  const cur = st.current;
+  const cur = st.inflight[n];
   const save = () => db.set(STATE, st);
   if (cur.step === 'comment') {
     const realPage = spec.page ? st.pages[spec.page] : null;
@@ -186,9 +205,14 @@ async function finishRequest(spec, n, st, customer, siteUrl, agentName, db) {
     await transitionTo(cur.key, true);
     cur.step = 'done';
   }
-  const key = cur.key;
-  delete st.current;
-  return key;
+  return cur.key;
+}
+
+/** Indices of the plan that are not finished yet, in plan order. */
+export function pendingIndices(st, total, limit) {
+  const out = [];
+  for (let i = 0; i < total && out.length < limit; i += 1) if (!st.doneIdx[i]) out.push(i);
+  return out;
 }
 
 /**
@@ -202,7 +226,7 @@ export async function seedNext(db, config, ctx) {
   const plan = seedPlan();
 
   if (st.phase === 'idle' || st.phase === 'error') {
-    st = { phase: 'pages', serviceDeskId: config.serviceDeskId, spaceId: config.spaceId, spaceKey: config.spaceKey, created: [], total: plan.length };
+    st = { phase: 'pages', serviceDeskId: config.serviceDeskId, spaceId: config.spaceId, spaceKey: config.spaceKey, created: [], doneIdx: {}, inflight: {}, total: plan.length };
   }
   try {
     if (st.phase === 'pages') {
@@ -213,11 +237,28 @@ export async function seedNext(db, config, ctx) {
       st.requestTypeId = await requestTypeId(st.serviceDeskId);
       st.phase = 'requests';
     } else if (st.phase === 'requests') {
-      const from = st.created.length;
-      for (let i = from; i < Math.min(from + PER_STEP, plan.length); i += 1) {
-        st.created.push(await createRequest(plan[i], i, st, ctx.siteUrl, ctx.agentName, db));
+      // State written before parallel creation existed: one request in st.current, done ones in order.
+      if (!st.doneIdx) {
+        st.doneIdx = Object.fromEntries(st.created.map((key, i) => [i, key]));
+        st.inflight = st.current ? { [st.current.index]: { key: st.current.key, step: st.current.step } } : {};
+        delete st.current;
       }
-      if (st.created.length >= plan.length) st.phase = 'done';
+      const started = Date.now();
+      do {
+        const batch = pendingIndices(st, plan.length, PARALLEL);
+        if (batch.length === 0) break;
+        const results = await Promise.allSettled(batch.map((i) => createRequest(plan[i], i, st, ctx.siteUrl, ctx.agentName, db)));
+        results.forEach((r, j) => {
+          if (r.status !== 'fulfilled') return;
+          const i = batch[j];
+          st.doneIdx[i] = r.value;
+          st.created.push(r.value);
+          delete st.inflight[i];
+        });
+        const failed = results.find((r) => r.status === 'rejected');
+        if (failed) throw failed.reason;
+      } while (Date.now() - started < STEP_BUDGET_MS);
+      if (pendingIndices(st, plan.length, 1).length === 0) st.phase = 'done';
     }
     delete st.error;
   } catch (e) {
