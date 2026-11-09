@@ -12,8 +12,8 @@ See which support answers break when you edit a help article.
 
 ## Category and bonus
 
-- Category: Apps for Business Teams (support teams). Decided by Dima on 04.11.
-- Bonus prizes: Best Agents - Rovo/Assignable agents (rovo:agent module with three rovo:action modules) and Best app with Atlassian MCP (rovo:mcp module exposing the same three actions as tools). Decided by Dima on 06.11. One submission can win at most one bonus prize.
+- Category: Apps for Business Teams (support teams).
+- Bonus prize: Best Agents - Rovo/Assignable agents (rovo:agent module with three rovo:action modules). The same three actions are also exposed as an MCP server (rovo:mcp); the submission form allows one bonus.
 
 ## Inspiration
 
