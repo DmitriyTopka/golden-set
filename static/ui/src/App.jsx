@@ -555,7 +555,7 @@ function QueueApp() {
       {s && (
         <section className="card">
           <h2>3. Article changes</h2>
-          <p className="muted">Golden Set checks the articles every five minutes and each time this page opens. You can also check one now.</p>
+          <p className="muted">Golden Set checks an article as soon as it is published in Confluence, and again every five minutes. You can also check one now.</p>
           {overview.isAdmin && overview.seed?.pages?.['100001'] && (
             <DemoEdit pageId={overview.seed.pages['100001']} open={impacts.some((r) => r.pageId === String(overview.seed.pages['100001']))} onDone={refresh} onError={setError} />
           )}

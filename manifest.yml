@@ -86,6 +86,11 @@ modules:
           type: string
           required: true
           description: Title of the help article that was edited.
+  trigger:
+    - key: article-updated
+      function: on-page-updated
+      events:
+        - avi:confluence:updated:page
   scheduledTrigger:
     - key: check-article-edits
       function: check-all
@@ -102,6 +107,8 @@ modules:
     - key: check-all
       handler: scheduled.scheduledCheck
       timeoutSeconds: 300
+    - key: on-page-updated
+      handler: scheduled.onPageUpdated
 resources:
   - key: main
     path: static/ui/dist

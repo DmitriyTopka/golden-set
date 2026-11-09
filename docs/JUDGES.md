@@ -71,4 +71,4 @@ Golden Set has no external egress and runs no LLM of its own: selection, linking
 - Golden Set works best when agents link the help article in their replies. It ties an answer without a link to an article by matching facts and marks it "by fact".
 - It reads English best. The facts it compares are numbers, money, percentages and durations.
 - Up to 50 pairs per project, re-test CSV files up to 100 rows (the Evaluations limit).
-- Golden Set checks the articles every five minutes and each time an administrator opens the page.
+- Golden Set checks an article as soon as it is published in Confluence, and again every five minutes and each time an administrator opens the page.

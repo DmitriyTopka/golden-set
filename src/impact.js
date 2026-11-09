@@ -259,3 +259,18 @@ export async function scheduledCheck() {
     if (changed.length) console.log(`scheduled check ${projectKey}: ${changed.map((r) => `${r.pageId} ${r.record.counts.affected}/${r.record.counts.outdated}`).join(', ')}`);
   }
 }
+
+/**
+ * Confluence page update event: checks that page at once for every project whose golden set relies
+ * on it, so the result does not wait for the five-minute schedule. The schedule stays as a safety net.
+ */
+export async function onPageUpdated(event) {
+  const pageId = String(event?.content?.id || '');
+  if (!pageId) return;
+  for (const projectKey of await registeredProjects()) {
+    const pages = (await forProject(projectKey).get('pages:used')) || [];
+    if (!pages.includes(pageId)) continue;
+    const res = await checkPage(projectKey, pageId).catch((e) => ({ reason: `error: ${e.message}` }));
+    console.log(`page event ${projectKey} page ${pageId}: ${res.reason}`);
+  }
+}
