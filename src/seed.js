@@ -130,7 +130,28 @@ export function pickTransition(all, wantDone) {
     || fits[0];
 }
 
-async function transitionTo(key, wantDone) {
+// The agent reply travels inside the resolve transition, not as a separate comment. JSM project
+// templates can carry the flow "customer comments on a closed request -> reopen it"; it runs a few
+// seconds after a standalone comment, finds the request already resolved and fails, emailing the
+// flow owner each time. A comment added during a transition is not a primary comment action, so
+// that flow skips it.
+export function commentUpdate(text) {
+  const content = [];
+  text.split('\n').forEach((line, i) => {
+    if (i) content.push({ type: 'hardBreak' });
+    if (line) content.push({ type: 'text', text: line });
+  });
+  return {
+    comment: [{
+      add: {
+        body: { type: 'doc', version: 1, content: [{ type: 'paragraph', content }] },
+        properties: [{ key: 'sd.public.comment', value: { internal: false } }],
+      },
+    }],
+  };
+}
+
+async function transitionTo(key, wantDone, comment) {
   const seen = new Set();
   for (let hop = 0; hop < 4; hop += 1) {
     const res = await call('user', 'jira', route`/rest/api/3/issue/${key}/transitions?expand=transitions.fields`);
@@ -144,6 +165,7 @@ async function transitionTo(key, wantDone) {
       const first = step.fields.resolution.allowedValues?.[0];
       body.fields = { resolution: first?.id ? { id: String(first.id) } : { name: 'Done' } };
     }
+    if (step === target && comment) body.update = commentUpdate(comment);
     await call('user', 'jira', route`/rest/api/3/issue/${key}/transitions`, { method: 'POST', body });
     if (step === target) return;
   }
@@ -184,11 +206,18 @@ async function finishRequest(spec, n, st, customer, siteUrl, agentName, db) {
   if (cur.step === 'comment') {
     const realPage = spec.page ? st.pages[spec.page] : null;
     const pageUrl = realPage ? `${siteUrl}/wiki/spaces/${st.spaceKey}/pages/${realPage}` : null;
-    await call('user', 'jira', route`/rest/servicedeskapi/request/${cur.key}/comment`, {
-      method: 'POST',
-      body: { body: replyText(spec, customer, agentName, pageUrl, n), public: true },
-    });
-    cur.step = 'resolve';
+    const reply = replyText(spec, customer, agentName, pageUrl, n);
+    try {
+      await transitionTo(cur.key, true, reply);
+    } catch (e) {
+      // A workflow that refuses a comment on the transition: fall back to comment, then resolve.
+      await call('user', 'jira', route`/rest/servicedeskapi/request/${cur.key}/comment`, {
+        method: 'POST',
+        body: { body: reply, public: true },
+      });
+      await transitionTo(cur.key, true);
+    }
+    cur.step = spec.reopen ? 'reopen' : 'done';
     await save();
   }
   if (cur.step === 'resolve') {
