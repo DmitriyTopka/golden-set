@@ -27,6 +27,8 @@ See which support answers break when you edit a help article. It predicted all 8
 
 **What you will see in three minutes.** Load the demo data, scan, press **Make the demo edit**, and the 8 answers at risk appear with a suggested fix for each.
 
+**What it costs.** It works without Rovo. No LLM runs on our side and the app calls no outside service, so the scan, the edit check, the Confluence line and the CSV cost you nothing to try. Rovo is needed only for the agent, the MCP tools and the Evaluations run.
+
 ## Inspiration
 
 I worked on a support bot for an electronics shop. The bot answered from help articles, and the articles kept changing: a return window, a delivery fee, a warranty term. Every edit was small and sensible. Nobody could say which of yesterday's correct answers it had just turned wrong.
@@ -103,6 +105,8 @@ Golden Set ships a rovo:mcp module named Golden Set. It exposes the three read-o
 ## Testing instructions
 
 Install link: https://developer.atlassian.com/console/install/c4b582c2-566a-4180-9837-2917cd0f3d87?signature=AYABeNQ3%2BbBT9DRlZpYUfyVY5RIAAAADAAdhd3Mta21zAEthcm46YXdzOmttczp1cy13ZXN0LTI6NzA5NTg3ODM1MjQzOmtleS83MDVlZDY3MC1mNTdjLTQxYjUtOWY5Yi1lM2YyZGNjMTQ2ZTcAuAECAQB4CxqLTo9l4lqXuFjNim1xJM%2Bp%2F3TVP9xHS2BrU5DRRucBj%2BxACBeGAYnGRvmWSX1q1QAAAH4wfAYJKoZIhvcNAQcGoG8wbQIBADBoBgkqhkiG9w0BBwEwHgYJYIZIAWUDBAEuMBEEDMlW2qRDxUPdBDWGsgIBEIA767C9s5ZV8WsDMgDCFiE4ZHWhin46GkbMUzLxG8FodWBpNDkIQDEplsDaeIPGiIK%2Ffs1xrJlliC5j%2FIAAB2F3cy1rbXMAS2Fybjphd3M6a21zOmV1LXdlc3QtMTo3MDk1ODc4MzUyNDM6a2V5LzQ2MzBjZTZiLTAwYzMtNGRlMi04NzdiLTYyN2UyMDYwZTVjYwC4AQICAHi9bVMAkme4qVQX1fQHo6ePw3H40A7cGfz7yrmSfBWMXgGffwoLXEJlAO%2FYyyLciml6AAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMN1AajZ2d%2FXIZrDMBAgEQgDuZLQAUMl38aEszBOGKWPLdJLwEwObJiZVHcDUUXA9lcUeuq91QZvGUgPjTtNJ9RCpYRjb5kX6cN%2BwofQAHYXdzLWttcwBLYXJuOmF3czprbXM6dXMtZWFzdC0xOjcwOTU4NzgzNTI0MzprZXkvNmMxMjBiYTAtNGNkNS00OTg1LWI4MmUtNDBhMDQ5NTJjYzU3ALgBAgIAeDYASx0XCjkny4iLV6vz%2BKtEGSGT6kdt0QRpkn6D%2FlVEAeCO%2B%2B4NhOlFZyuS1uS3ma4AAAB%2BMHwGCSqGSIb3DQEHBqBvMG0CAQAwaAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAwMMIz7FcV0t1f9g0ICARCAO5pEulk3HIENlSS0UefX%2BAdnyvJ4vGh7RIcD4ktf9SmHB3%2Fv2krRCXzS0vBipkevz6LmUIBIi8bGiAPVAgAAAAAMAAAQAAAAAAAAAAAAAAAAAEm3u0AB9lHR3UepVtOavAP%2F%2F%2F%2F%2FAAAAAQAAAAAAAAAAAAAAAQAAADJkn5CvzpO1v8QigXAZjxTcRY%2F7OM0Uo21ilQwJa9n16DqRXcAB57w%2Bj2IMQkWiXhtLFopy6etH31Fm6CxjMeRtZ98%3D&product=jira&product=confluence
+
+It works without Rovo: all three steps need only Jira Service Management and Confluence. Testing costs nothing: no LLM, no outside service.
 
 Quick path (about 3 minutes of clicks plus about a minute and a half of waiting for demo data):
 
