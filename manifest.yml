@@ -14,6 +14,11 @@ modules:
         function: resolver
       viewportSize: large
       contentPropertyKey: golden-set-byline-6f1c2a
+      # Only on articles Golden Set has published counts for, not on every page of the site.
+      displayConditions:
+        entityPropertyExists:
+          entity: content
+          propertyKey: golden-set-byline-6f1c2a
   rovo:agent:
     - key: golden-set-assistant
       name: Golden Set
