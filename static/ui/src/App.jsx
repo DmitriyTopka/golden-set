@@ -217,7 +217,7 @@ function StatusTag({ status }) {
   return s ? <span className={`status ${s.cls}`} title={s.hint}>{s.label}</span> : null;
 }
 
-function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
+function ImpactCard({ r, isAdmin, onDone, onError, onNotice, onEdit }) {
   const [busy, setBusy] = useState(false);
   const suggestions = r.affected.filter((a) => a.suggestion).length;
   const needPerson = r.affected.filter((a) => a.needsReview).length;
@@ -231,6 +231,12 @@ function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
       const res = await invoke('acceptEdit', { pageId: r.pageId, applySuggestions });
       await onDone();
       if (res?.changedAgain) onError(`${r.title} was edited again after this check. The list now shows the latest version; review it and accept again.`);
+      else if (res?.accepted) {
+        const n = res.applied || 0;
+        onNotice(n > 0
+          ? `${r.title}: edit accepted, ${n} ${n === 1 ? 'answer' : 'answers'} updated to the new wording. The golden set, the re-test CSV and the line in Confluence now use the new answers.`
+          : `${r.title}: edit accepted, answers left as they were.`);
+      }
     } catch (e) {
       onError(e.message);
     } finally {
@@ -263,7 +269,7 @@ function ImpactCard({ r, isAdmin, onDone, onError, onEdit }) {
           </tr>
         </thead>
         <tbody>
-          {r.affected.map((a) => (
+          {r.affected.slice().sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true })).map((a) => (
             <tr key={a.id}>
               <td className="mono">{a.id}</td>
               <td>{a.question}</td>
@@ -363,14 +369,23 @@ function StatusLine({ s, impacts }) {
 function DemoEdit({ open, onDone, onError }) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
+  // The button follows what the article says, not whether an edit is open: after an accepted edit
+  // it still says 14 days, and the way back must stay there.
+  const [at14, setAt14] = useState(open);
+  const peek = useCallback(() => {
+    invoke('demoEdit', { peek: true }).then((r) => setAt14(Boolean(r?.at14))).catch(() => setAt14(open));
+  }, [open]);
+  useEffect(() => { peek(); }, [peek]);
+  const undo = at14;
   const run = async () => {
     setBusy(true);
     setNote('');
     try {
-      const r = await invoke('demoEdit', { undo: open });
+      const r = await invoke('demoEdit', { undo });
       if (r?.reason === 'changed_by_hand') setNote('The demo article was changed by hand, so the demo edit was not applied.');
-      if (r?.reason === 'already') setNote(open ? 'Returns policy already says 30 days.' : 'Returns policy already says 14 days and that edit was accepted.');
+      if (r?.reason === 'already') setNote(undo ? 'Returns policy already says 30 days.' : 'Returns policy already says 14 days.');
       await onDone();
+      peek();
     } catch (e) {
       onError(e.message);
     } finally {
@@ -379,8 +394,8 @@ function DemoEdit({ open, onDone, onError }) {
   };
   return (
     <div className="row demo-edit">
-      <span>{open ? 'Demo: Returns policy now says 14 days.' : 'Try it on the demo data: change Returns policy in Confluence from 30 to 14 days.'}</span>
-      <button onClick={run} disabled={busy}>{busy ? 'Working…' : open ? 'Put it back to 30 days' : 'Make the demo edit'}</button>
+      <span>{undo ? 'Demo: Returns policy now says 14 days.' : 'Try it on the demo data: change Returns policy in Confluence from 30 to 14 days.'}</span>
+      <button onClick={run} disabled={busy}>{busy ? 'Working…' : undo ? 'Put it back to 30 days' : 'Make the demo edit'}</button>
       {note && <span className="muted">{note}</span>}
     </div>
   );
@@ -419,6 +434,7 @@ function QueueApp() {
   const [pairs, setPairs] = useState(null);
   const [impacts, setImpacts] = useState([]);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   const refresh = useCallback(async () => {
     try {
@@ -443,6 +459,19 @@ function QueueApp() {
   }, [refresh]);
 
   const seed = useStepper(null, () => invoke('seedNext'), (s) => s.phase === 'done');
+  const removal = useStepper(null, () => invoke('removeDemoNext'), (s) => s.phase === 'done');
+  const [confirmRemove, setConfirmRemove] = useState(false);
+  const removeDemo = async () => {
+    if (!confirmRemove) return setConfirmRemove(true);
+    setConfirmRemove(false);
+    const r = await removal.run();
+    await refresh();
+    if (r?.phase === 'done') {
+      setNotice(r.failed?.length
+        ? `Removed ${r.deleted} of ${r.total} demo requests. ${r.failed.length} could not be deleted (you need the Delete issues permission): ${r.failed.slice(0, 5).join(', ')}${r.failed.length > 5 ? '…' : ''}. The golden set is cleared.`
+        : `Demo data removed: ${r.deleted} requests deleted, Returns policy back to 30 days, golden set cleared. The 6 help articles stay in Confluence; delete them there if you don't need them.`);
+    }
+  };
   const scan = useStepper(
     () => invoke('scanStart'),
     async () => {
@@ -504,6 +533,12 @@ function QueueApp() {
           <button className="link-button" onClick={() => setError('')}>Dismiss</button>
         </div>
       )}
+      {notice && (
+        <div className="banner ok" role="status">
+          <span>{notice}</span>
+          <button className="link-button" onClick={() => setNotice('')}>Dismiss</button>
+        </div>
+      )}
 
       <Setup overview={overview} onSaved={refresh} />
 
@@ -527,6 +562,13 @@ function QueueApp() {
                   : 'Load demo data (Northwind Gear)'}
             </button>
             )}
+            {overview.seed?.phase === 'done' && (
+              <button className="subtle" onClick={removeDemo} disabled={removal.running || seed.running || scan.running}>
+                {removal.running
+                  ? `Removing demo data… ${removal.state?.done ?? 0}/${removal.state?.total ?? '?'}`
+                  : confirmRemove ? `Click again to delete the ${overview.seed?.total ?? 80} demo requests` : 'Remove demo data'}
+              </button>
+            )}
           </div>
           {!s && overview.seed?.phase !== 'done' && (
             <p className="muted small">
@@ -535,7 +577,7 @@ function QueueApp() {
             </p>
           )}
           {!s && overview.seed?.phase === 'done' && <p className="hint">Demo data is ready. Next: <b>Scan resolved requests</b>.</p>}
-          {(scan.error || seed.error) && <p className="error">{scan.error || seed.error}</p>}
+          {(scan.error || seed.error || removal.error) && <p className="error">{scan.error || seed.error || removal.error}</p>}
           {s && s.requests > 0 && s.selected === 0 && (
             <p className="error small">
               No request made it into the golden set. Usually the answers are not public agent replies (for example, the agent is also the customer who raised the request). See "Why requests were left out" below.
@@ -562,7 +604,7 @@ function QueueApp() {
           {overview.isAdmin && <CheckNow pairs={pairs.selected} onDone={refresh} onError={setError} />}
           {impacts.length === 0 && <p className="muted">No article has changed since the golden set was built.</p>}
           {impacts.map((r) => (
-            <ImpactCard key={r.pageId} r={r} isAdmin={overview.isAdmin} onDone={refresh} onError={setError} onEdit={editAnswer} />
+            <ImpactCard key={r.pageId} r={r} isAdmin={overview.isAdmin} onDone={refresh} onError={setError} onNotice={setNotice} onEdit={editAnswer} />
           ))}
         </section>
       )}

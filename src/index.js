@@ -173,7 +173,7 @@ resolver.define('scanFinish', async ({ context }) => {
   await db.set('articles:versions', Object.fromEntries(usedPages.map((id) => [id, known[id] ?? articles.find((a) => a.pageId === id)?.version])));
   for (const r of await listImpacts(db)) if (!usedPages.includes(r.pageId)) await db.del(`impact:${r.pageId}`);
   await db.clearList('cand');
-  const summary = { ...result.stats, selected: next.selected.length, excludedByAdmin: next.excluded.length, articles: articles.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
+  const summary = { ...result.stats, selected: next.selected.length, excludedByAdmin: next.excluded.length, articles: usedPages.length, spaceId: cfg.spaceId, scannedAt: new Date().toISOString() };
   await db.set('result:summary', summary);
   await db.set('scan:state', { phase: 'done', total: st?.keys?.length || results.length, done: results.length });
   const dropped = await registerProject(cfg.projectKey, usedPages);
@@ -308,6 +308,8 @@ resolver.define('demoEdit', async ({ payload, context }) => {
   if (!pageId) return { reason: 'no_demo' };
   const page = await call('user', 'confluence', route`/wiki/api/v2/pages/${pageId}?body-format=storage`);
   const body = page?.body?.storage?.value || '';
+  // The page can say 14 days with no open edit (the edit was accepted): then the button puts it back.
+  if (payload?.peek) return { at14: body.includes(DEMO_TO) && !body.includes(DEMO_FROM), pageId };
   const [from, to] = payload?.undo ? [DEMO_TO, DEMO_FROM] : [DEMO_FROM, DEMO_TO];
   if (!body.includes(from)) return { reason: body.includes(to) ? 'already' : 'changed_by_hand', pageId };
   await call('user', 'confluence', route`/wiki/api/v2/pages/${pageId}`, {
@@ -323,6 +325,50 @@ resolver.define('demoEdit', async ({ payload, context }) => {
   const res = await checkPage(projectKey, pageId);
   console.log(`demoEdit ${projectKey} page ${pageId} undo=${Boolean(payload?.undo)}: ${res.reason}`);
   return { reason: res.reason, pageId };
+});
+
+/**
+ * "Remove demo data": deletes the demo requests this project got from Load demo data, puts the
+ * Returns policy article back to 30 days and clears the golden set, a few requests per call so each
+ * call stays well under the resolver time limit. The help articles stay in Confluence: the app has no
+ * right to delete pages, and the guide says so.
+ */
+const REMOVE_BUDGET_MS = 10000;
+resolver.define('removeDemoNext', async ({ context }) => {
+  const { projectKey, db } = await guard(context, 'admin');
+  const seed = await seedState(db);
+  let st = await db.get('demo:remove');
+  if (!st) {
+    const keys = [...new Set([...(seed.created || []), ...Object.values(seed.inflight || {}).map((x) => x?.key)].filter(Boolean))];
+    st = { phase: 'requests', left: keys, total: keys.length, failed: [] };
+    await db.set('demo:remove', st);
+  }
+  const started = Date.now();
+  while (st.phase === 'requests' && st.left.length && Date.now() - started < REMOVE_BUDGET_MS) {
+    const batch = st.left.slice(0, 4);
+    const results = await Promise.allSettled(batch.map((key) => call('user', 'jira', route`/rest/api/3/issue/${key}`, { method: 'DELETE', allow404: true })));
+    results.forEach((r, i) => { if (r.status === 'rejected') st.failed.push(batch[i]); });
+    st.left = st.left.slice(batch.length);
+    await db.set('demo:remove', st);
+  }
+  if (st.phase === 'requests' && !st.left.length) {
+    const pageId = seed.pages?.['100001'];
+    if (pageId) {
+      const page = await call('user', 'confluence', route`/wiki/api/v2/pages/${pageId}?body-format=storage`, { allow404: true });
+      const body = page?.body?.storage?.value || '';
+      if (body.includes(DEMO_TO)) {
+        await call('user', 'confluence', route`/wiki/api/v2/pages/${pageId}`, {
+          method: 'PUT',
+          body: { id: String(pageId), status: 'current', title: page.title, body: { representation: 'storage', value: body.split(DEMO_TO).join(DEMO_FROM) }, version: { number: (page.version?.number || 1) + 1, message: 'Golden Set demo removed: back to 30 days' } },
+        }).catch(() => null);
+      }
+    }
+    await clearResults(db, projectKey);
+    await Promise.all([resetSeed(db), db.del('scan:state'), db.del('demo:remove')]);
+    console.log(`removeDemo ${projectKey}: ${st.total - st.failed.length} deleted, ${st.failed.length} failed`);
+    return { phase: 'done', total: st.total, deleted: st.total - st.failed.length, failed: st.failed };
+  }
+  return { phase: st.phase, total: st.total, done: st.total - st.left.length };
 });
 
 // Opening the page checks for article edits at once, so nobody waits for the five-minute schedule.

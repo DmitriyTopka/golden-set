@@ -54,3 +54,4 @@ td.mono { font-family: ui-monospace, Menlo, monospace; white-space: nowrap; }
 .status-line.ok { background: #e3fcef; color: #064; }
 .status-line.bad { background: #ffebe6; color: #ae2a19; }
 .status[title] { cursor: help; }
+.banner.ok { background: #e3fcef; color: #064; }

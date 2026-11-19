@@ -33,6 +33,8 @@ See which support answers break when you edit a help article. It predicted all 8
 
 I worked on a support bot for an electronics shop. The bot answered from help articles, and the articles kept changing: a return window, a delivery fee, a warranty term. Every edit was small and sensible. Nobody could say which of yesterday's correct answers it had just turned wrong.
 
+This is not only our problem. In Moffatt v. Air Canada (2024 BCCRT 149) the airline's chatbot told a customer he could claim a bereavement fare refund within 90 days, while the airline's own policy page said otherwise, and the tribunal held the airline responsible for what its chatbot said. Golden Set closes that gap on the help desk side: you know which answers depend on a policy page before a customer finds the mismatch.
+
 Rovo Agent Evaluations can re-test an agent, but you have to bring the questions and the expected answers yourself, in a CSV you write by hand. Most teams never write it. And even with a test set, nothing tells you which tests a given edit puts at risk.
 
 Evaluations give you a test runner. Golden Set gives you the test set, and the map of which tests each article can break.
@@ -41,7 +43,7 @@ Evaluations give you a test runner. Golden Set gives you the test set, and the m
 
 Golden Set is a Forge app for Jira Service Management and Confluence, with a Rovo agent.
 
-1. **Builds a golden set from resolved requests.** It reads closed requests, keeps the ones that were solved (not reopened, no complaint after the answer, no low satisfaction rating), strips personal data and keeps up to 50 question and answer pairs. Each pair is tied to the Confluence article it relies on: by the link the agent pasted, or by matching facts when there is no link. On our demo project: 80 resolved requests in, 15 rejected with a reason, 5 duplicates folded, 50 golden pairs across 7 articles.
+1. **Builds a golden set from resolved requests.** It reads closed requests, keeps the ones that were solved (not reopened, no complaint after the answer, no low satisfaction rating), strips personal data and keeps up to 50 question and answer pairs. Each pair is tied to the Confluence article it relies on: by the link the agent pasted, or by matching facts when there is no link. On our demo project: 80 resolved requests in, 15 rejected with a reason, 5 duplicates folded, 50 golden pairs across 6 articles.
 2. **Watches the articles.** The moment an article is published (a Confluence page update event), with a five-minute check and a check on page open as a safety net, it compares the article with the text the answers were written against. Change "30 days" to "14 days" in Returns policy and Golden Set shows: 12 golden answers depend on this page, 8 are likely outdated, here is the change, here is a suggested new answer for each.
 3. **Knows when not to guess.** One customer wrote that the watch "arrived about three weeks ago", and the answer said "so you are still in time". With 30 days that was true. With 14 days it is false, because the answer depends on how long ago the item arrived. Replacing 30 with 14 would keep the sentence and make it wrong, so Golden Set marks that answer "Needs a person" instead of suggesting one. We found this case in our own end-to-end run and built the rule from it.
 4. **Shows it where people edit.** A line under the article title in Confluence says "Golden Set: 8 of 12 answers may be outdated". It shows counts only, never customer text.
@@ -51,7 +53,7 @@ Golden Set is a Forge app for Jira Service Management and Confluence, with a Rov
 
 ## How it differs from drift checkers
 
-Several Codegeist entries compare a Confluence page with Jira work and flag when the two drift apart. Golden Set looks at a different pair: the article and the answers your customers already received. Its unit is a resolved request with a verified answer, and its output is a test set you can run in Rovo Evaluations. Release gates that read an agent evaluation report sit one step later: they judge the results of a run, and Golden Set supplies the dataset that run needs. On our demo the prediction came before the test run: Golden Set flagged 8 of the 12 answers that rely on Returns policy, and Evaluations then failed exactly those 8 (92% before the edit, 33% after).
+Several Codegeist entries watch for something that went out of date: a policy value restated on other pages, a date promised to a customer, a Confluence page against the code, a page against Jira work. Golden Set watches a different thing: the answers your customers already received and accepted. Its unit is a resolved request with a verified answer, and its output is a test set you can run in Rovo Evaluations. Release gates that read an agent evaluation report sit one step later: they judge the results of a run, and Golden Set supplies the dataset that run needs. On our demo the prediction came before the test run: Golden Set flagged 8 of the 12 answers that rely on Returns policy, and Evaluations then failed exactly those 8 (92% before the edit, 33% after). And replacing the old number is not always enough, which is why one of our answers goes to a person.
 
 ## How we built it
 
@@ -113,6 +115,8 @@ Quick path (about 3 minutes of clicks plus about a minute and a half of waiting 
 1. Install from the link above into Jira, and make sure Confluence is connected to the same installation.
 2. In a test service project open Queues > Golden Set, pick a Confluence space, press Save, then Load demo data (Northwind Gear). It runs by itself for about 75 seconds. Then press Scan resolved requests: 80 read, 15 rejected, 5 duplicates, 50 golden pairs.
 3. In section 3 press **Make the demo edit**: Golden Set changes "within 30 days of delivery" to "within 14 days of delivery" in the Returns policy article and checks it at once (you can also edit the article in Confluence by hand and reload). You see: 12 golden answers depend on this page, 8 likely outdated, and the smartwatch answer is marked Needs a person.
+
+When you are done, **Remove demo data** in section 2 deletes the demo requests, puts Returns policy back to 30 days and clears the golden set.
 
 Full guide: docs/JUDGES.md in the repository: install, one-click demo data, a 10 minute walkthrough with the numbers you should see, and why each permission is needed.
 

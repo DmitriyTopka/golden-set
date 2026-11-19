@@ -49,6 +49,11 @@ export async function publishByline(pageId, projectKey, counts) {
     if (known.has(key) && key !== projectKey) projects[key] = { total: count(c?.total), outdated: count(c?.outdated) };
   }
   if (counts) projects[projectKey] = { total: count(counts.total), outdated: count(counts.outdated) };
+  // No project relies on the page any more: remove the property, so the line under the title goes away.
+  if (Object.keys(projects).length === 0) {
+    if (existing) await call('app', 'confluence', route`/wiki/api/v2/pages/${pageId}/properties/${existing.id}`, { method: 'DELETE', allow404: true });
+    return null;
+  }
   const total = Object.values(projects).reduce((n, c) => n + c.total, 0);
   const outdated = Object.values(projects).reduce((n, c) => n + c.outdated, 0);
   const value = {

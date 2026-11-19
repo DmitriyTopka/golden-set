@@ -8,7 +8,7 @@ Article: Returns policy (page 3571713), 12 golden pairs rely on it.
 
 | # | Step | Result | Status |
 |---|------|--------|--------|
-| 1 | Build the golden set from 80 resolved requests | 15 rejected, 5 duplicates folded, 50 pairs across 7 articles | ✅ |
+| 1 | Build the golden set from 80 resolved requests | 15 rejected, 5 duplicates folded, 50 pairs across 6 articles | ✅ |
 | 2 | Re-test CSV for Returns policy, article says 30 days | Evals #001: 92% (11 of 12) | ✅ |
 | 3 | Edit the article: 30 days -> 14 days | The five minute check found it in 4.5 min; on-open check finds it at once | ✅ |
 | 4 | Golden Set screen | "12 golden answers depend on this page, 8 likely outdated", suggested answers for all 8 | ✅ |
@@ -81,6 +81,6 @@ Without a token the endpoint answers 401 with a pointer to the OAuth metadata.
 
 ## Demo data load time (09.11.2026)
 
-Requests are now created four at a time. On a fresh service project made from the IT service management template, Load demo data finished in 65 to 75 seconds (it took about 6 minutes before). Scan after it: 80 resolved requests read, 15 rejected, 5 duplicates folded, 50 golden pairs across 7 articles, the same numbers as before. All 80 requests ended in the resolved status.
+Requests are now created four at a time. On a fresh service project made from the IT service management template, Load demo data finished in 65 to 75 seconds (it took about 6 minutes before). Scan after it: 80 resolved requests read, 15 rejected, 5 duplicates folded, 50 golden pairs across 6 articles, the same numbers as before. All 80 requests ended in the resolved status.
 
 The same run found a bug the old code shared: that template offers "Cancel request" next to "Resolve this issue", and the loader picked the first done transition, so every request ended Canceled and the reopened examples could not be reopened. The loader now prefers a resolving transition and never picks cancel or decline while another one leads to done.
