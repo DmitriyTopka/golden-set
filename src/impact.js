@@ -252,9 +252,24 @@ export async function checkProject(projectKey) {
   return results;
 }
 
+/**
+ * A deleted (or trashed) project stays registered and would cost storage reads every five minutes
+ * forever. Only a 404 counts as gone: any other error keeps the project, so a Jira hiccup cannot
+ * unregister a live golden set.
+ */
+async function dropIfDeleted(projectKey) {
+  const project = await call('app', 'jira', route`/rest/api/3/project/${projectKey}`, { allow404: true });
+  if (project) return false;
+  const dropped = await registerProject(projectKey, []);
+  for (const id of dropped) await publishByline(id, projectKey, null).catch(() => null);
+  console.log(`scheduled check ${projectKey}: project no longer exists, unregistered`);
+  return true;
+}
+
 /** Scheduled every five minutes in the Jira installation. */
 export async function scheduledCheck() {
   for (const projectKey of await registeredProjects()) {
+    if (await dropIfDeleted(projectKey).catch(() => false)) continue;
     // One failing project must not stop the checks of the others.
     const results = await checkProject(projectKey).catch((e) => {
       console.error(`scheduled check ${projectKey} failed: ${e.message}`);
