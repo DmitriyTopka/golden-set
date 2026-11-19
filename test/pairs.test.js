@@ -117,3 +117,21 @@ describe('long text is capped (review finding 10)', () => {
     expect(res.pair.answerOriginal.length).toBeLessThanOrEqual(MAX_TEXT);
   });
 });
+
+describe('reply posted inside the resolve transition', () => {
+  const reply = (created) => ({
+    id: 'r',
+    author: agent,
+    public: true,
+    body: 'Hi Priya,\nYou have 30 days from delivery.\nBest regards,\nSam Rivera',
+    created,
+  });
+  test('a reply stamped a second after the resolution still counts', () => {
+    const res = buildCandidate(req({ resolvedAt: '2026-09-01T10:00:00.950Z', comments: [reply('2026-09-01T10:00:01Z')] }));
+    expect(res.ok).toBe(true);
+  });
+  test('a reply written well after the resolution does not', () => {
+    const res = buildCandidate(req({ resolvedAt: '2026-09-01T10:00:00Z', comments: [reply('2026-09-01T10:05:00Z')] }));
+    expect(res).toMatchObject({ ok: false, reason: REJECT.NO_ANSWER });
+  });
+});

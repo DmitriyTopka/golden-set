@@ -71,6 +71,9 @@ export function cleanQuestion(summary, description, names = []) {
  */
 // A pasted log or a long thread must not push a stored list over the storage value limit.
 export const MAX_TEXT = 1500;
+// A reply posted inside the resolve transition is stored a few milliseconds after the resolution
+// date, and JSM reports comment times to the second, so a reply can look up to a second late.
+export const RESOLVE_GRACE_MS = 5000;
 const cap = (t) => (t.length > MAX_TEXT ? `${t.slice(0, MAX_TEXT - 1).trimEnd()}…` : t);
 
 export function buildCandidate(request) {
@@ -78,7 +81,7 @@ export function buildCandidate(request) {
   const comments = [...(request.comments || [])].filter((c) => c.public).sort(byCreated);
   const resolvedAt = request.resolvedAt ? time(request.resolvedAt) : Infinity;
 
-  const agentReplies = comments.filter((c) => isAgentAuthor(c.author, reporterId) && time(c.created) <= resolvedAt);
+  const agentReplies = comments.filter((c) => isAgentAuthor(c.author, reporterId) && time(c.created) <= resolvedAt + RESOLVE_GRACE_MS);
   const answer = agentReplies[agentReplies.length - 1];
   if (!answer) return { ok: false, key: request.key, reason: REJECT.NO_ANSWER };
   if (isReopened(request.statusHistory)) return { ok: false, key: request.key, reason: REJECT.REOPENED };
