@@ -29,7 +29,10 @@ async function guard(context, level) {
   const projectKey = projectKeyOf(context);
   const perms = await permissions(projectKey);
   if (!perms.browse || (level === 'admin' && !perms.admin)) {
-    throw new Error(level === 'admin' ? 'Only project administrators can change the golden set.' : 'You do not have access to this project.');
+    // Jira takes a minute or two to set up a new project's permissions; until then even its creator
+    // reads as having no access, so the message says what to do instead of only refusing.
+    const fresh = ' If you just created this project, wait a minute for Jira to finish setting it up and reload the page.';
+    throw new Error((level === 'admin' ? 'Only project administrators can change the golden set.' : 'You do not have access to this project.') + fresh);
   }
   return { projectKey, perms, db: forProject(projectKey) };
 }

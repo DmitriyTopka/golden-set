@@ -23,7 +23,7 @@ If the page says "Installation failed" in Jira, wait a minute and try again. We 
 
 ## Try it in 10 minutes
 
-1. In your service project, open **Queues** in the project sidebar and pick **Golden Set** at the bottom of the queue list.
+1. In your service project, open **Queues** in the project sidebar and pick **Golden Set** at the bottom of the queue list. If you have just created the project, give Jira a minute or two to finish setting it up: until then the project may open on a plain issue list without Queues, and Golden Set may say you have no access. Reload and it appears.
 2. **1. Which knowledge base do agents answer from?** Pick your test Confluence space and press **Save**.
 3. **2. Build the golden set.** Press **Load demo data (Northwind Gear)**. It takes about 75 seconds; you can watch the counter. Then press **Scan resolved requests**.
    You should see: 80 resolved requests read, 15 rejected (reasons listed below the pairs), 5 duplicates folded, 50 golden pairs across 6 articles.
