@@ -29,6 +29,8 @@ See which support answers break when you edit a help article. It predicted all 8
 
 **What it costs.** It works without Rovo. No LLM runs on our side and the app calls no outside service, so the scan, the edit check, the Confluence line and the CSV cost you nothing to try. Rovo is needed only for the agent, the MCP tools and the Evaluations run.
 
+**The video, by chapter.** 0:00 a help article changes from 30 to 14 days · 0:21 what the edit broke, and the one answer Golden Set refuses to guess · 1:04 the prediction checked in Rovo Evaluations (92%, 33%, 83%) · 1:29 the Golden Set agent in Rovo chat · 1:41 where the golden answers come from · 2:03 how it works
+
 ## Inspiration
 
 I worked on a support bot for an electronics shop. The bot answered from help articles, and the articles kept changing: a return window, a delivery fee, a warranty term. Every edit was small and sensible. Nobody could say which of yesterday's correct answers it had just turned wrong.
@@ -53,13 +55,13 @@ Golden Set is a Forge app for Jira Service Management and Confluence, with a Rov
 
 ## How it differs from drift checkers
 
-Several Codegeist entries watch for something that went out of date: a policy value restated on other pages, a date promised to a customer, a Confluence page against the code, a page against Jira work. Golden Set watches a different thing: the answers your customers already received and accepted. Its unit is a resolved request with a verified answer, and its output is a test set you can run in Rovo Evaluations. Release gates that read an agent evaluation report sit one step later: they judge the results of a run, and Golden Set supplies the dataset that run needs. On our demo the prediction came before the test run: Golden Set flagged 8 of the 12 answers that rely on Returns policy, and Evaluations then failed exactly those 8 (92% before the edit, 33% after). And replacing the old number is not always enough, which is why one of our answers goes to a person.
+Several Codegeist entries watch for something that went out of date: a policy value restated on other pages, a date promised to a customer, a Confluence page against the code, a page against Jira work. Golden Set watches a different thing: the answers your customers already received and accepted. Its unit is a resolved request with a verified answer, and its output is a test set you can run in Rovo Evaluations. Release gates that read an agent evaluation report sit one step later: they judge the results of a run, and Golden Set supplies the dataset that run needs. On our demo the prediction came before the test run: Golden Set flagged 8 of the 12 answers that rely on Returns policy, and Evaluations then failed exactly those 8 (92% before the edit, 33% after). And replacing the old number is not always enough, which is why one of our answers goes to a person. Some entries also keep "golden" questions for a page. There a person or a model writes the question, and a stand-in model answers it. Ours are not written by anyone: each pair is a request a customer raised and an answer that closed it, and the re-test runs in Rovo Evaluations itself, not in a proxy.
 
 ## How we built it
 
 - **Forge** with a JSM queue page (Custom UI, React), a Confluence byline item, a trigger on Confluence page updates plus a scheduled trigger as a safety net, a Rovo agent with three read-only actions, an MCP server (rovo:mcp) that exposes the same actions as tools, and Forge KVS storage.
 - **One installation for Jira and Confluence** (app compatibility: Jira required, Confluence optional), so data, permissions and the Rovo agent are shared and Rovo lists one Golden Set agent.
-- **A deterministic core with no LLM of its own**: personal data redaction (emails, phones, cards with a Luhn check, IBAN, names from the request), answer cleanup, fact extraction (numbers, money, percentages, durations), linking, scoring, deduplication, article diff and suggestions. Same input, same result, zero inference cost. 126 unit tests, including a "dirty" set of realistic requests.
+- **A deterministic core with no LLM of its own**: personal data redaction (emails, phones, cards with a Luhn check, IBAN, names from the request), answer cleanup, fact extraction (numbers, money, percentages, durations), linking, scoring, deduplication, article diff and suggestions. Same input, same result, zero inference cost. 129 unit tests, including a "dirty" set of realistic requests.
 - **Permissions checked as the asking user** everywhere: Browse projects and access to the knowledge base space to read, Administer projects to change anything, per-request visibility (issue security) and per-page restrictions in Confluence. The page and the Rovo actions use the same gate.
 - **Forge limits respected**: scans and demo data run in short steps under the 25 second resolver limit; text is capped to stay under the storage value limit; only redacted candidates are ever stored.
 

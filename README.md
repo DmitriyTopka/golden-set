@@ -39,7 +39,7 @@ Our end-to-end run with Rovo Evaluations, 92% before the edit, 33% after it, 83%
 | `src/` | Forge side: resolvers, permission checks as the asking user, storage, the article check on every Confluence page update (with a five-minute safety net), Rovo actions, demo data loader. |
 | `static/ui/` | The queue page (Custom UI, React). |
 | `seed/` | Northwind Gear, a fictional shop: 6 help articles and 80 resolved requests, all synthetic. |
-| `test/` | 126 unit tests, including a set of messy real-world-like requests. |
+| `test/` | 129 unit tests, including a set of messy real-world-like requests. |
 
 One installation covers Jira and Confluence (app compatibility: Jira required, Confluence optional), so storage, permissions and the Rovo agent are shared.
 
