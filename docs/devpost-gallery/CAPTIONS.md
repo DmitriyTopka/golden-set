@@ -11,3 +11,4 @@
 | 06-rovo-agent-chat.jpg | The Golden Set agent in Rovo chat names the article, the change and the answers at risk. |
 | 07-evals-92-33-83.jpg | Rovo Evaluations, same 12 questions: #001 and #002 use the 30-day answers (92%, then 33% after the edit), #003 the fixed ones (83%). |
 | 08-eval-002-eight-failures.jpg | Run #002: the 8 failures are the 8 answers Golden Set flagged before the run. |
+| 09-mcp-inspector.jpg | The official MCP Inspector connected to the app through mcp.atlassian.com: three read-only tools, and get-article-pairs returns the 12 golden answers for Returns policy. |
