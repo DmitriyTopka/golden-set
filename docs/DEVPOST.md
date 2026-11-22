@@ -19,7 +19,7 @@ See which support answers break when you edit a help article. It predicted all 8
 
 **Who it is for.** Support leads and knowledge base owners who run a Jira Service Management help desk on Confluence articles, with or without a Rovo agent answering customers.
 
-**What breaks.** A small, sensible edit to a help article (30 days becomes 14) quietly turns yesterday's correct answers wrong. Nobody knows which ones.
+**What breaks.** A small, sensible edit to a help article (30 days becomes 14) quietly turns yesterday's correct answers wrong. Nobody knows which ones. It costs real money: in Moffatt v. Air Canada (2024) a chatbot promised a refund that the airline's own policy page ruled out, and the tribunal made the airline pay.
 
 **What Golden Set does.** It turns your resolved requests into a *golden set*: verified pairs of a customer question and the answer that solved it, each tied to the article it relies on. When that article changes, Golden Set names the pairs that are now wrong and suggests new answers.
 
