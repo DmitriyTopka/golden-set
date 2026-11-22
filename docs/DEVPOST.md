@@ -25,6 +25,8 @@ See which support answers break when you edit a help article. It predicted all 8
 
 **The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on Returns policy. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 83% after the suggested fixes.
 
+**Checked by someone else.** Another Codegeist entrant installed Golden Set on their own site and caught a miscount: 18 requests rejected instead of 15. We traced it and fixed it. They rescanned the same project and got the numbers from our guide, 80 read, 15 rejected, 5 duplicates, 50 pairs, then 12 and 8 on the demo edit ([their post on the Atlassian developer forum](https://community.developer.atlassian.com/t/103885/10)).
+
 **What you will see in three minutes.** Load the demo data, scan, press **Make the demo edit**, and the 8 answers at risk appear with a suggested fix for each.
 
 **What it costs.** It works without Rovo. No LLM runs on our side and the app calls no outside service, so the scan, the edit check, the Confluence line and the CSV cost you nothing to try. Rovo is needed only for the agent, the MCP tools and the Evaluations run.

@@ -12,6 +12,8 @@ Built for Atlassian Codegeist 2026.
 
 **The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on the Returns policy article. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 83% after the suggested fixes. Demo data is synthetic (Northwind Gear, a fictional shop).
 
+**Checked by someone else.** Another Codegeist entrant installed Golden Set on their own site and caught a miscount: 18 requests rejected instead of 15. We traced it and fixed it. They rescanned the same project and got the numbers from our guide, 80 read, 15 rejected, 5 duplicates, 50 pairs, then 12 and 8 on the demo edit ([their post on the Atlassian developer forum](https://community.developer.atlassian.com/t/103885/10)).
+
 ![Returns policy changed from 30 to 14 days: 12 golden answers depend on it, 8 are likely outdated](docs/devpost-gallery/01-article-edit-detected.jpg)
 
 ![A suggested answer for each outdated pair; the smartwatch answer goes to a person](docs/devpost-gallery/03-suggestions-and-needs-a-person.jpg)
