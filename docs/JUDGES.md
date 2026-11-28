@@ -19,6 +19,8 @@ Time needed: about 3 minutes to install, about 10 minutes to try everything with
 2. Pick your site and install Golden Set into **Jira**.
 3. Make sure **Confluence** is connected to the same installation. The link asks for both products; if Confluence is missing, open admin.atlassian.com, your site, **Connected apps > golden-set-app > Connections**, and press **Connect** next to Confluence. Jira and Confluence share one installation, and Rovo shows one Golden Set agent.
 
+Confluence can show "Installing..." for up to 5 minutes after Jira is done. Keep the page open until it says "Installation successful".
+
 If the page says "Installation failed" in Jira, wait a minute and try again. We saw this once on a fresh site; the second attempt worked.
 
 ## Try it in 10 minutes
@@ -27,11 +29,11 @@ If the page says "Installation failed" in Jira, wait a minute and try again. We 
 2. **1. Which knowledge base do agents answer from?** Pick your test Confluence space and press **Save**.
 3. **2. Build the golden set.** Press **Load demo data (Northwind Gear)**. It takes about 75 seconds; you can watch the counter. Then press **Scan resolved requests**.
    You should see: 80 resolved requests read, 15 rejected (reasons listed below the pairs), 5 duplicates folded, 50 golden pairs across 6 articles.
-4. Look at **4. Golden pairs**. Each answer comes from a resolved request and shows the article it relies on. Personal data never reaches the set: open the smartwatch request ("Can I still return my smartwatch?") in Jira, and you will see the customer left an email address there; the golden question has no trace of it. Inside a sentence Golden Set writes [email], [phone] or [name] instead. Try the **Help article** filter, **Not golden**, and **Edit** on an answer.
+4. Look at **4. Golden pairs**. Each answer comes from a resolved request and shows the article it relies on. Personal data never reaches the set: inside a sentence Golden Set writes [email], [phone] or [name] instead of an email address, a phone number or a name. The demo requests contain no personal data, so you will not see these placeholders in the demo set; `test/pii.test.js` shows the filter at work. Try the **Help article** filter, **Not golden**, and **Edit** on an answer.
 5. In **3. Article changes** press **Make the demo edit**. Golden Set changes "within 30 days of delivery" to "within 14 days of delivery" in the demo article **Returns policy** and checks it at once. Or do it by hand: open the page in Confluence, change the sentence and publish. **Put it back to 30 days** undoes the demo edit.
 6. Back in Golden Set, reload the page (or pick the article and press **Check now**). Section **3. Article changes** says that 12 golden answers depend on this page and 8 are likely outdated, shows the change "30 days -> 14 days" and a suggested new answer for each.
-   One answer (the smartwatch that "arrived about three weeks ago") gets no suggestion and is marked **Needs a person**: changing only the number would flip its verdict. Rewrite it with **Edit**.
-7. In Confluence, the line under the article title shows the Golden Set count: "Golden Set: 8 of 12 answers may be outdated". Look at it now, before you accept the edit.
+   One answer (the smartwatch that "arrived about three weeks ago") gets no suggestion and is marked **Needs a person**: changing only the number would flip its verdict.
+7. In Confluence, the line under the article title shows the Golden Set count: "Golden Set: 8 of 12 answers may be outdated". Look at it now. Then come back to Golden Set and rewrite the smartwatch answer with **Edit**: it moves to Re-check, and the Confluence line drops to "7 of 12".
 8. Press **Download re-test CSV** if you want the dataset, then **Apply suggested answers and accept edit**. A green line confirms how many answers were updated; section 3 goes back to "No article has changed", and the Confluence line now says "Golden Set: 12 answers depend on this page". **Put it back to 30 days** stays available, so you can run the edit again.
 9. When you are done, **Remove demo data** in section 2 deletes the 80 demo requests, puts Returns policy back to 30 days and clears the golden set. The 6 help articles stay in Confluence (Golden Set has no right to delete pages); delete them there if you don't need them.
 
