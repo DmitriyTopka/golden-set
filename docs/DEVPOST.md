@@ -23,7 +23,7 @@ See which support answers break when you edit a help article. It predicted all 8
 
 **What Golden Set does.** It turns your resolved requests into a *golden set*: verified pairs of a customer question and the answer that solved it, each tied to the article it relies on. When that article changes, Golden Set names the pairs that are now wrong and suggests new answers.
 
-**The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on Returns policy. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 83% after the suggested fixes.
+**The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on Returns policy. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 75% after the suggested fixes. The three that still fail are the two answers Golden Set handed to a person and one question the article never covered.
 
 **Checked by someone else.** Another Codegeist entrant installed Golden Set on their own site and caught a miscount: 18 requests rejected instead of 15. We traced it and fixed it. They rescanned the same project and got the numbers from our guide, 80 read, 15 rejected, 5 duplicates, 50 pairs, then 12 and 8 on the demo edit ([their post on the Atlassian developer forum](https://community.developer.atlassian.com/t/103885/10)).
 
@@ -51,7 +51,7 @@ Golden Set is a Forge app for Jira Service Management and Confluence, with a Rov
 2. **Watches the articles.** The moment an article is published (a Confluence page update event), with a five-minute check and a check on page open as a safety net, it compares the article with the text the answers were written against. Change "30 days" to "14 days" in Returns policy and Golden Set shows: 12 golden answers depend on this page, 8 are likely outdated, here is the change, here is a suggested new answer for each.
 3. **Knows when not to guess.** One customer wrote that the watch "arrived about three weeks ago", and the answer said "so you are still in time". With 30 days that was true. With 14 days it is false, because the answer depends on how long ago the item arrived. Replacing 30 with 14 would keep the sentence and make it wrong, so Golden Set marks that answer "Needs a person" instead of suggesting one. We found this case in our own end-to-end run and built the rule from it.
 4. **Shows it where people edit.** A line under the article title in Confluence says "Golden Set: 8 of 12 answers may be outdated". It shows counts only, never customer text.
-5. **Closes the loop with Rovo Evaluations.** One click downloads the affected pairs as an Evaluations dataset. In our run the same 12 questions scored 92% before the edit and 33% after it. The 8 failures were exactly the 8 answers Golden Set had flagged before any evaluation ran. After applying the suggestions the score came back to 83%; the two remaining failures were the "three weeks" answer above and a question the help article never covered.
+5. **Closes the loop with Rovo Evaluations.** One click downloads the affected pairs as an Evaluations dataset. In our run the same 12 questions scored 92% before the edit and 33% after it. The 8 failures were exactly the 8 answers Golden Set had flagged before any evaluation ran. After applying the suggestions the score came back to 75% (9 of 12, the same in two runs). The three failures are the two answers Golden Set handed to a person, where the agent rightly said "too late" and the expected answer still waits for a person to rewrite it, and a question the help article never covered.
 6. **Answers in Rovo chat.** The Golden Set agent answers "Which golden answers did the last article edit break?", shows the golden answers for an article, and hands over the re-test CSV.
 7. **Lets admins stay in charge.** Admins can mark a pair "not golden", restore it, rewrite an expected answer, undo the rewrite, and accept an edit with or without the suggestions. Rewrites survive a rescan.
 
@@ -76,7 +76,7 @@ Several Codegeist entries watch for something that went out of date: a policy va
 
 ## Accomplishments that we're proud of
 
-- The prediction held: Golden Set named the 8 broken answers before Evaluations confirmed them (92% -> 33% -> 83%).
+- The prediction held: Golden Set named the 8 broken answers before Evaluations confirmed them (92% -> 33% -> 75%).
 - It works without Rovo. On a clean site we ran the scan, the edit check, the Confluence line and the CSV without touching Rovo: 5 of 5.
 - Exports carry no personal data: the CSV from the clean site had 50 rows, 0 email addresses and 0 customer or agent names.
 

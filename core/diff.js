@@ -153,6 +153,9 @@ export function verdictDependsOnElapsedTime(question, expected) {
  */
 export function suggestAnswer(pair, outdatedFacts) {
   const suggestion = suggestFix(pair.expected, outdatedFacts);
-  if (suggestion && verdictDependsOnElapsedTime(pair.question, pair.expected)) return { suggestion: null, needsReview: 'verdict_depends_on_elapsed_time' };
+  // The expected answer keeps only sentences with facts, so "Not too late." can be cut from it while the
+  // agent's reply still decided the case. Until an admin rewrites the answer, the reply counts too.
+  const decidedBy = pair.edited || !pair.answerOriginal ? pair.expected : `${pair.answerOriginal} ${pair.expected}`;
+  if (suggestion && verdictDependsOnElapsedTime(pair.question, decidedBy)) return { suggestion: null, needsReview: 'verdict_depends_on_elapsed_time' };
   return { suggestion, needsReview: null };
 }

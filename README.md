@@ -10,7 +10,7 @@ Demo video (2:27): https://youtu.be/FUgnW8DuiIU
 
 Built for Atlassian Codegeist 2026.
 
-**The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on the Returns policy article. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 83% after the suggested fixes. Demo data is synthetic (Northwind Gear, a fictional shop).
+**The proof.** Before any test ran, Golden Set flagged 8 of the 12 answers that rely on the Returns policy article. Rovo Agent Evaluations then failed exactly those 8: 92% before the edit, 33% after it, 75% after the suggested fixes. The three that still fail are the two answers Golden Set handed to a person and one question the article never covered. Demo data is synthetic (Northwind Gear, a fictional shop).
 
 **Checked by someone else.** Another Codegeist entrant installed Golden Set on their own site and caught a miscount: 18 requests rejected instead of 15. We traced it and fixed it. They rescanned the same project and got the numbers from our guide, 80 read, 15 rejected, 5 duplicates, 50 pairs, then 12 and 8 on the demo edit ([their post on the Atlassian developer forum](https://community.developer.atlassian.com/t/103885/10)).
 
@@ -18,7 +18,7 @@ Built for Atlassian Codegeist 2026.
 
 ![A suggested answer for each outdated pair; the smartwatch answer goes to a person](docs/devpost-gallery/03-suggestions-and-needs-a-person.jpg)
 
-![Rovo Evaluations on the same 12 questions: 92%, 33%, 83%](docs/devpost-gallery/07-evals-92-33-83.jpg)
+![Rovo Evaluations on the same 12 questions: 92% before the edit, 33% after it, 75% after the suggestions in runs #004 and #005 (#003 at 83% was before the keyboard fix)](docs/e2e/16-evals-001-005.jpg)
 
 ## What you get
 
@@ -31,7 +31,7 @@ Built for Atlassian Codegeist 2026.
 
 Install link, one-click demo data and a 10 minute walkthrough with the numbers you should see: [docs/JUDGES.md](docs/JUDGES.md).
 
-Our end-to-end run with Rovo Evaluations, 92% before the edit, 33% after it, 83% after the suggestions: [docs/E2E.md](docs/E2E.md).
+Our end-to-end run with Rovo Evaluations, 92% before the edit, 33% after it, 75% after the suggestions: [docs/E2E.md](docs/E2E.md).
 
 ## How it is built
 

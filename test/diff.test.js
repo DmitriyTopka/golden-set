@@ -117,6 +117,11 @@ describe('computeImpact', () => {
     const page = seed.articles.find((a) => a.pageId === '100001');
     const impact = computeImpact(selected.filter((p) => ids.has(p.id)), diffArticle(page.body, seed.demoEdit.body));
     expect(impact.counts).toEqual({ affected: 12, outdated: 8, recheck: 4 });
+    // Of the 8 likely outdated answers, the two whose verdict depends on elapsed time go to a person (GST-1 found by an outside tester).
+    const byId = new Map(selected.map((p) => [p.id, p]));
+    const outdated = impact.affected.filter((a) => a.status === 'likely_outdated');
+    const toPerson = outdated.filter((a) => suggestAnswer(byId.get(a.id), diffArticle(page.body, seed.demoEdit.body).outdatedFacts).needsReview);
+    expect(toPerson.map((a) => byId.get(a.id).summary).sort()).toEqual(['Can I still return my smartwatch?', 'Too late to return a keyboard?']);
   });
 });
 
@@ -177,6 +182,25 @@ describe('suggestAnswer', () => {
   test('a plain fact next to an elapsed time is still updated (NS-3)', () => {
     const r = suggestAnswer(pair('Too late to return a keyboard? The keyboard was delivered 25 days ago, unopened.', 'The return window is 30 days from delivery.'), d.outdatedFacts);
     expect(r).toEqual({ suggestion: 'The return window is 14 days from delivery.', needsReview: null });
+  });
+
+  test('a verdict cut from the expected answer but present in the agent reply goes to a human (GST-1)', () => {
+    const p = { ...pair('Too late to return a keyboard? The keyboard was delivered 25 days ago, unopened.', 'The return window is 30 days from delivery.'), answerOriginal: 'Hello [name], Not too late. The return window is 30 days from delivery. More details: Cheers, [name]' };
+    expect(suggestAnswer(p, d.outdatedFacts)).toEqual({ suggestion: null, needsReview: 'verdict_depends_on_elapsed_time' });
+    // Once an admin has rewritten the answer, only the admin's text counts.
+    expect(suggestAnswer({ ...p, edited: { from: p.expected, at: '2026-11-28' } }, d.outdatedFacts)).toEqual({ suggestion: 'The return window is 14 days from delivery.', needsReview: null });
+  });
+
+  test('other verdict wordings cut from the expected answer are caught through the agent reply', () => {
+    const q = 'Is it too late to return my speaker? It was delivered 25 days ago.';
+    const expected = 'The return window is 30 days from delivery.';
+    for (const verdict of ['Yes, you can still return it.', "You're eligible for a return.", 'Sorry, that is too late.', 'No, the window has expired.', 'You are within the window.']) {
+      const r = suggestAnswer({ question: q, expected, answerOriginal: `Hi [name], ${verdict} ${expected} Thanks, [name]` }, d.outdatedFacts);
+      expect([verdict, r.needsReview]).toEqual([verdict, 'verdict_depends_on_elapsed_time']);
+    }
+    // A conditional in the reply decides nothing and keeps the suggestion.
+    const cond = suggestAnswer({ question: q, expected, answerOriginal: `If it arrived less than 30 days ago you can still return it. ${expected}` }, d.outdatedFacts);
+    expect(cond).toEqual({ suggestion: 'The return window is 14 days from delivery.', needsReview: null });
   });
 
   test('a verdict without any elapsed time in the question is updated (NS-8)', () => {

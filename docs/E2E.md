@@ -18,8 +18,11 @@ Article: Returns policy (page 3571713), 12 golden pairs rely on it.
 | 8 | Apply 8 suggested answers and accept the edit, download CSV for Returns policy | 12 rows, expected answers now say 14 days, file passes tools/check-csv.mjs | ✅ |
 | 9 | Re-run with the updated answers | Evals #003: 83% (10 of 12) | ✅ with two findings below |
 | 10 | Put the demo back: article 14 -> 30, on-open check, apply | Edit found (version 6 to 7), 8 suggestions applied, "No article has changed" | ✅ |
+| 11 | 28.11, after the GST-1 fix (development 2.39.0): edit 30 -> 14, apply 6 suggestions, 2 left to a person, download CSV | 12 rows, NS-2 and NS-3 keep the 30-day expected answer | ✅ |
+| 12 | Re-run with that CSV, twice | Evals #004: 75% (9 of 12), #005: 75% (9 of 12). Failed: NS-2 and NS-3 (the agent said "too late", which is right for 14 days; the expected answers wait for a person) and NS-8 (sale items, not in the article) | ✅ (docs/e2e/14-, 15-, 16-) |
+| 13 | Put the demo back: 14 -> 30, apply 6 suggestions | "No article has changed" | ✅ |
 
-The headline numbers: 92% before the edit, 33% after it, 83% after applying the suggestions.
+The headline numbers: 92% before the edit, 33% after it, 75% after applying the suggestions (83% in #003 was before the keyboard fix: its number swap hid a flipped verdict).
 Golden Set predicted which 8 answers would break before any evaluation was run, and #002 confirmed all 8.
 
 ## The two failures in #003, and what they mean
@@ -37,6 +40,11 @@ Golden Set predicted which 8 answers would break before any evaluation was run, 
    NS-2 shows "Needs a person", the button reads "Apply 7 suggested answers", the Rovo agent says a person should
    rewrite NS-2 (docs/e2e/11-ns2-needs-a-person.png, 12-rovo-ns2-note.jpg). The other 7 suggestions are unchanged.
    Conditional answers like NS-6 ("If it arrived less than 30 days ago you can still return it") keep their suggestion.
+   **Found by an outside tester on 28.11 (GST-1, NS-3 here):** "Too late to return a keyboard? Delivered 25 days ago" with the reply
+   "Not too late. The return window is 30 days from delivery." The expected answer keeps only sentences with facts, so
+   "Not too late." was cut and the verdict check saw no verdict. Fix: the check also reads the agent reply until an admin
+   rewrites the answer. Checked on the development installation 2.39.0 with the article at 14 days: NS-2 and NS-3 both show
+   "Needs a person", counts unchanged at 12 and 8 (docs/e2e/13-ns3-needs-a-person-dev.png).
 2. **NS-8 sale items, a knowledge base gap, not a Golden Set bug.** The expected answer ("sale items have the same
    return window") came from a human agent's resolved request. The Returns policy article never mentions sale items,
    so the Rovo agent correctly said it could not confirm and passed the request on. Golden Set could surface this
